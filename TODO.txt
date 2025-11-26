@@ -1,0 +1,10 @@
+#TODO: Changer la manière de gérer les évènements pour pouvoir les gérer depuis chaque entités
+#TODO: Dessiner tout les objets a la fois pour éviter une liste de Objet.draw() etc...
+#TODO: Améliorer le gaussian blur
+#TODO: Addons basés sur python (API)
+#TODO: Meilleure lisibilité
+#TODO: Meilleure optipisation
+#TODO: Simplifier le moteur audio
+#TODO: Add multiprocessing support for event/update/draw loops
+#TODO: Button collisions are using center but the center is pointing to the right
+#TODO: Achivements
