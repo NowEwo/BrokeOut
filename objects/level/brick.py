@@ -4,7 +4,6 @@ import math
 import pygame
 
 from objects.prototype import Entity
-from settings import BALL_RADIUS
 from systems.logging import Logger
 
 
@@ -33,6 +32,13 @@ class Brick(Entity):
         """Check if brick is still alive (This was a trial, I'm making a note here: Huge success)"""
         return self.life > 0
 
+    def draw_text(self):
+        self.text_rect = self.scene.font.get_rect("•" * self.life, size=16)
+        self.text_rect.center = (self.x, self.y)
+
+        self.scene.font.render_to(self.scene.surface, self.text_rect, "•" * self.life, self.scene.background_color(),
+                                  size=16)
+
     def draw(self):
         """Draw the brick"""
         rect = pygame.Rect(
@@ -42,15 +48,24 @@ class Brick(Entity):
             self.height
         )
         pygame.draw.rect(self.scene.surface, self.color, rect, 0)
+        self.draw_text()
 
-        self.text_rect = self.scene.font.get_rect("•" * self.life, size=16)
-        self.text_rect.center = (self.x, self.y)
-
-        self.scene.font.render_to(self.scene.surface, self.text_rect, "•" * self.life, self.scene.background_color(),
-                                  size=16)
+    def draw_skeleton(self):
+        width, height = self.width*0.9, self.height*0.9
+        rect = pygame.Rect(
+            int(self.x - width / 2 + self.scene.offset_x),
+            int(self.y - height / 2 + self.scene.offset_y),
+            width,
+            height
+        )
+        pygame.draw.rect(self.scene.surface, self.color + [25], rect, 0)
 
     def handle_hit(self):
-        pass
+        self.life -= 1
+        self.logger.log(f"Brick {self} got hit ({self.life} left)")
+
+        score_change = 1500
+        self.scene.score += score_change
 
     def check_ball_collision(self):
         """Check and handle collision with ball"""
@@ -69,9 +84,9 @@ class Brick(Entity):
         dx = ball.x - closest_x
         dy = ball.y - closest_y
 
-        if (dx * dx + dy * dy) < BALL_RADIUS ** 2:
-            overlap_x = BALL_RADIUS - abs(dx)
-            overlap_y = BALL_RADIUS - abs(dy)
+        if (dx * dx + dy * dy) < self.game.config.game.ball.radius ** 2:
+            overlap_x = self.game.config.game.ball.radius - abs(dx)
+            overlap_y = self.game.config.game.ball.radius - abs(dy)
 
             if overlap_x < overlap_y:
                 ball.vx = -ball.vx
@@ -80,17 +95,53 @@ class Brick(Entity):
                 ball.vy = -ball.vy
                 ball.y += math.copysign(overlap_y, dy) # overlap_y value but dy sign
 
-            self.life -= 1
-            self.logger.log(f"Brick {self} got hit ({self.life} left)")
+            self.handle_hit()
 
-            score_change = 1500
-            self.scene.score += score_change
             self.scene.screen_shake.start(duration=3, magnitude=3)
             self.scene.shaders.set_curvature(0.41)
 
             return True
 
         return False
+
+class LargeBrick(Brick):
+    def __init__(self, x, y, scene):
+        super().__init__(x, y, scene)
+
+    def handle_hit(self):
+        if self.scene.player.width>=220:
+            self.scene.player.width=220
+        else:
+            self.scene.player.width += 50
+        self.life = -1
+
+    def draw_text(self):
+        self.text_rect = self.scene.font.get_rect("<->", size=16)
+        self.text_rect.center = (self.x, self.y)
+
+        self.scene.font.render_to(self.scene.surface, self.text_rect, "<->", self.scene.background_color(),
+                                  size=16)
+
+class FastBrick(Brick):
+    def __init__(self, x, y, scene):
+        super().__init__(x, y, scene)
+
+    def handle_hit(self):
+        if self.scene.ball.speed>= 16:
+            self.scene.ball.speed =16
+        else:
+            self.scene.ball.speed += 2
+        self.life = -1
+
+    def draw_text(self):
+        self.text_rect = self.scene.font.get_rect(">>>", size=16)
+        self.text_rect.center = (self.x, self.y)
+
+        self.scene.font.render_to(self.scene.surface, self.text_rect, ">>>", self.scene.background_color(),
+                                  size=16)
+
+
+
 
 class BrickGroup(Entity):
     def __init__(self) -> None:
@@ -104,10 +155,16 @@ class BrickGroup(Entity):
     def generate_bricks(self):
         """Generate brick layout"""
         self.bricks = []
-        for i in range(9):
-            for j in range(14):
-                brick = Brick(((i % 2) * 13) + 51 + (j * 53), 59 + (i * 33), self.scene)
-                self.bricks.append(brick)
+        level = self.scene.levels[(self.scene.level-1)%len(self.scene.levels)]
+        self.logger.warn(f"{level=}")
+        for line in range(len(level)):
+            for brick in range(len(level[line])):
+                if level[line][brick] != 0 :
+                    brick = (
+                        level[line][brick]
+                        (((line % 2) * 13) + 51 + (brick * 53), 59 + (line * 33), self.scene)
+                    )
+                    self.bricks.append(brick)
 
     def update(self):
         if not self.bricks:
@@ -128,3 +185,25 @@ class BrickGroup(Entity):
                 brick.draw()
             else:
                 self.bricks.remove(brick)
+
+class BricksSkeleton(Entity):
+    def __init__(self) -> None:
+        self.logger = Logger("objects.brick.bricks_skeleton")
+        self.bricks = []
+
+        super().__init__()
+
+        self.logger.log("Initialised brick group")
+        self.level = self.scene.levels[self.scene.level%len(self.scene.levels)]
+        for line in range(len(self.level)):
+            for brick in range(len(self.level[line])):
+                if self.level[line][brick] != 0 :
+                    brick = (
+                        self.level[line][brick]
+                        (((line % 2) * 13) + 51 + (brick * 53), 59 + (line * 33), self.scene)
+                    )
+                    self.bricks.append(brick)
+
+    def draw(self):
+        for brick in self.bricks:
+            brick.draw_skeleton()

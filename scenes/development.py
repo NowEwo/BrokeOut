@@ -4,9 +4,9 @@ import pygame
 import pygame.freetype
 
 from core.scene_manager import Scene
-from settings import *
 from systems import renderer
 
+from objects.gui import mouse
 
 class DevelopmentScene(Scene):
     # noinspection PyDefaultArgument
@@ -15,6 +15,9 @@ class DevelopmentScene(Scene):
         self.shaders = renderer.Renderer()
 
         super().__init__()
+
+    def run(self):
+        self.mouse = mouse.Mouse()
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -30,7 +33,7 @@ class DevelopmentScene(Scene):
 
         surface = pygame.Surface(self.game.window.get_size(), pygame.SRCALPHA)
 
-        # DO DEV THINGS
+        self.mouse.draw()
 
         self.game.window.blit(surface, (0, 0))
 

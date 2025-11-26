@@ -5,17 +5,16 @@ import numpy as np
 import pygame
 
 from objects.prototype import Entity
-from settings import (BALL_RADIUS,
-                      BALL_SPEED,
-                      TRAIL_LENGTH)
 
 
 class Ball(Entity):
     """Ball object that also manages the trail"""
 
     def __init__(self):
+        super().__init__()
+
         self.x, self.y = 500, 500
-        self.speed = BALL_SPEED
+        self.speed = self.game.config.game.ball.speed
         self.vx = 0
         self.vy = 0
         self.on_player = True
@@ -24,8 +23,6 @@ class Ball(Entity):
 
         self.gravity_enabled = False
 
-        super().__init__()
-
     def set_velocity_by_angle(self, angle):
         """Set ball velocity based on angle"""
         self.vx = self.speed * math.cos(math.radians(angle))
@@ -33,36 +30,36 @@ class Ball(Entity):
 
     def draw(self):
         """Draw ball and trail"""
-        current_pos = (int(self.x - BALL_RADIUS),
-                       int(self.y - BALL_RADIUS))
+        current_pos = (int(self.x - self.game.config.game.ball.radius),
+                       int(self.y - self.game.config.game.ball.radius))
         self.trail.insert(0, current_pos)
 
-        if len(self.trail) > TRAIL_LENGTH:
+        if len(self.trail) > self.game.config.graphics.ball.trail_length:
             self.trail.pop()
 
         # Draw trail with gradient effect generated from numpy (What did I do that ? -Ewo)
-        gradient = np.arange(0, 255, TRAIL_LENGTH)
+        gradient = np.arange(0, 255, self.game.config.graphics.ball.trail_length)
         if self.scene.game_started:
             for i, pos in enumerate(reversed(self.trail)):
                 pygame.draw.circle(self.scene.surface,
                                    (self.scene.color[0], self.scene.color[1], self.scene.color[2], gradient[i]), pos,
-                                   BALL_RADIUS, 0)
+                                   self.game.config.game.ball.radius, 0)
 
         # Draw actual ball
-        pygame.draw.circle(self.scene.surface, self.scene.color, current_pos, BALL_RADIUS, 0)
+        pygame.draw.circle(self.scene.surface, self.scene.color, current_pos, self.game.config.game.ball.radius, 0)
 
     def bounce_off_player(self, player):
         """Calculate bounce angle based on player hit x"""
         diff = player.x - self.x
-        total_length = player.width / 2 + BALL_RADIUS
+        total_length = player.width / 2 + self.game.config.game.ball.radius
         angle = 90 + 80 * diff / total_length
         self.set_velocity_by_angle(angle)
 
     def update(self):  # type: ignore
         """Update ball position and handle collisions"""
         if self.on_player:
-            self.y = self.scene.player.y - 1.5 * BALL_RADIUS
-            self.x = self.scene.player.x + BALL_RADIUS
+            self.y = self.scene.player.y - 1.5 * self.game.config.game.ball.radius
+            self.x = self.scene.player.x + self.game.config.game.ball.radius
         else:
             self.x += self.vx
             self.vy += 0.3 * self.gravity_enabled
@@ -77,16 +74,16 @@ class Ball(Entity):
                     self.vy = -self.vy
 
             # Wall collisions
-            if (self.x + BALL_RADIUS > self.scene.bounds['x_max'] or
-                    self.x - BALL_RADIUS < self.scene.bounds['x_min']):
+            if (self.x + self.game.config.game.ball.radius > self.scene.bounds['x_max'] or
+                    self.x - self.game.config.game.ball.radius < self.scene.bounds['x_min']):
                 self.vx = -self.vx
 
             # Lose the game (Bottom)
-            if self.y + BALL_RADIUS > self.scene.bounds['y_max']:
+            if self.y + self.game.config.game.ball.radius > self.scene.bounds['y_max']:
                 self.scene.trigger_lose()
 
             # Top
-            if self.y - BALL_RADIUS < self.scene.bounds['y_min']:
+            if self.y - self.game.config.game.ball.radius < self.scene.bounds['y_min']:
                 self.vy = -self.vy
 
         return None

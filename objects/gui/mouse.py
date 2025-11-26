@@ -3,23 +3,20 @@
 import pygame
 
 from objects import prototype
-from settings import *
 
 
 class Mouse(prototype.Entity):
     def __init__(self) -> None:
+        self.cursor = pygame.image.load("assets/images/store/cursor.png").convert_alpha()
+        self.rect = (0, 0, 16, 16)
+        self.i = 1
         super().__init__()
 
     def draw(self):
         if pygame.mouse.get_focused():
             mousex, mousey = pygame.mouse.get_pos()
-            cursor = pygame.Rect(
-                int(mousex - 2),
-                int(mousey - 2),
-                4, 4
-            )
-            if DEBUG_PRECISE_MOUSE:
-                pygame.draw.rect(self.game.window, [255, 0, 0], (mousex, 0, 1, RENDER_HEIGHT))
-                pygame.draw.rect(self.game.window, [255, 0, 0], (0, mousey, RENDER_WIDTH, 1))
+            if self.game.config.debug.precise_mouse:
+                pygame.draw.rect(self.game.window, [255, 0, 0], (mousex, 0, 1, self.game.config.graphics.render.height))
+                pygame.draw.rect(self.game.window, [255, 0, 0], (0, mousey, self.game.config.graphics.render.width, 1))
 
-            pygame.draw.rect(self.game.window, (255, 255, 255, 109), cursor, 0)
+            self.game.window.blit(self.cursor, (mousex+8, mousey+8*self.i))

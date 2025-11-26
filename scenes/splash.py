@@ -4,21 +4,20 @@ import pygame
 import pygame.freetype
 
 from core.scene_manager import Scene
-from settings import *
 from systems import renderer
 
 
 class SplashScene(Scene):
     # noinspection PyDefaultArgument
-    def __init__(self, color=[0, 0, 0]) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.color = color
+        self.color = [0, 0, 0]
 
         self.shaders = renderer.Renderer()
         self.fadeout = 0
         self.text_opacity = 0
 
-        self.font = pygame.freetype.Font("assets/fonts/pixelated.ttf", FONT_SIZE)
+        self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 36)
         self.text = "Made with love by Broke Team"
         self.text_color = [255, 255, 255]
 
@@ -56,7 +55,8 @@ class SplashScene(Scene):
 
         overlay = pygame.Rect(
             0, 0,
-            RENDER_WIDTH, RENDER_HEIGHT
+            self.game.config.graphics.render.width,
+            self.game.config.graphics.render.height
         )
         pygame.draw.rect(surface, (255 // 3, 153 // 3, 191 // 3, self.fadeout), overlay, 0)
 

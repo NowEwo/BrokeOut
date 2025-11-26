@@ -1,3 +1,5 @@
+from systems.config import config
+
 from datetime import datetime
 
 import colorama
@@ -10,20 +12,26 @@ class Logger:
             self.log(f"Logger element created for {name} as {self}")
 
     def log(self, message) -> None:
-        print(f"{colorama.Fore.BLUE}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
+        if config.engine.log_level > 3:
+            print(f"{colorama.Fore.BLUE}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
 
     def highlight(self, message) -> None:
-        print(
-            f"{colorama.Back.WHITE}{colorama.Fore.BLACK}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}{colorama.Back.RESET}")
+        if config.engine.log_level > -1:
+            print(
+                f"{colorama.Back.WHITE}{colorama.Fore.BLACK}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}{colorama.Back.RESET}")
 
     def warn(self, message) -> None:
-        print(f"{colorama.Fore.YELLOW}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
+        if config.engine.log_level > 2:
+            print(f"{colorama.Fore.YELLOW}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
 
     def success(self, message) -> None:
-        print(f"{colorama.Fore.GREEN}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
+        if config.engine.log_level > 3:
+            print(f"{colorama.Fore.GREEN}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
 
     def error(self, message) -> None:
-        print(f"{colorama.Fore.RED}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
+        if config.engine.log_level > 1:
+            print(f"{colorama.Fore.RED}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
 
     def critical(self, message) -> None:
-        print(f"{colorama.Back.RED}({datetime.now()}) [{self.name}] {message}{colorama.Back.RESET}")
+        if config.engine.log_level > 0:
+            print(f"{colorama.Back.RED}({datetime.now()}) [{self.name}] {message}{colorama.Back.RESET}")

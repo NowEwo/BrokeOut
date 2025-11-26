@@ -4,24 +4,24 @@ import pygame
 
 from core.context import GameContext
 from objects.prototype import Entity
-from settings import *
 
 
 class Player(Entity, GameContext):
     def __init__(self) -> None:
         super().__init__()
 
-        self.width = PLAYER_WIDTH_MULTIPLIER * BALL_RADIUS
+        self.base_width = self.game.config.game.player.width_multiplier * self.game.config.game.ball.radius
+        self.width = self.base_width
 
         self.x = (self.scene.bounds['x_min'] - self.scene.bounds['x_max']) / 2
-        self.y = self.scene.bounds['y_max'] - BALL_RADIUS - 5
+        self.y = self.scene.bounds['y_max'] - self.game.config.game.ball.radius - 5
 
-        self.autoplay = DEBUG_AUTOPLAY
+        self.autoplay = self.game.config.debug.game.autoplay
 
     def collides_with_ball(self, ball):
         """Check collision with ball"""
-        vertical = abs(self.y - ball.y) < 2 * BALL_RADIUS
-        horizontal = abs(self.x - ball.x) < self.width / 2 + BALL_RADIUS
+        vertical = abs(self.y - ball.y) < 2 * self.game.config.game.ball.radius
+        horizontal = abs(self.x - ball.x) < self.width / 2 + self.game.config.game.ball.radius
         return vertical and horizontal
 
     def update(self):
@@ -33,11 +33,14 @@ class Player(Entity, GameContext):
         else:
             self.x = x
 
+        if self.width > self.base_width:
+            self.width = self.width - 0.1
+
     def draw(self):
         rect = pygame.Rect(
             int(self.x - self.width / 2 + self.scene.offset_x),
-            int(self.y - BALL_RADIUS + self.scene.offset_y),
+            int(self.y - self.game.config.game.ball.radius + self.scene.offset_y),
             self.width,
-            2 * BALL_RADIUS
+            2 * self.game.config.game.ball.radius
         )
         pygame.draw.rect(self.scene.surface, self.scene.color, rect, 0)

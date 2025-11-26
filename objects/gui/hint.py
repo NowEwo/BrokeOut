@@ -1,9 +1,4 @@
-# type: ignore
-
 from objects.prototype import Entity
-
-from settings import *
-
 
 class HintElement(Entity):
     def __init__(self) -> None:
@@ -19,7 +14,7 @@ class HintElement(Entity):
     def draw(self):
         if self.timer > 0:
             self.text_rect = self.scene.font.get_rect(self.hint_text, size=self.size)
-            self.text_rect.center = (self.scene.surface.get_rect().center[0], RENDER_HEIGHT - 139)
+            self.text_rect.center = (self.scene.surface.get_rect().center[0], self.game.config.graphics.render.height - 139)
 
             self.scene.font.render_to(self.scene.surface, self.text_rect, self.hint_text, (self.scene.color[0],self.scene.color[1],self.scene.color[2], self.timer),
                                       size=self.size)

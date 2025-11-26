@@ -1,25 +1,30 @@
 import pygame
 
-from core import context, error_handler, scene_manager
-from settings import *
+from core import context, error_handler, scene_manager, event_manager
 from systems import discord, logging
+from systems.config import config
 
 
 class Game:
     def __init__(self) -> None:
+        self.config = config
+
         self.logger = logging.Logger("core.engine")
-        self.error_handler = error_handler.ErrorHandler() if not DEBUG_DISABLE_ERROR_HANDLER else None
+        self.error_handler = error_handler.ErrorHandler() if self.config.debug.misc.error_handler else None
 
         context.GameContext.set_game(self)
 
         self.scene_manager = scene_manager.SceneManager()
+        self.event_manager = event_manager.EventManager()
 
     def handle_events(self):
         return self.scene_manager.active.handle_events()
 
-    @staticmethod
-    def update_window_title(text=""):
-        pygame.display.set_caption(f"BrokeOut {VERSION} ({RELEASE_STATE}){" - " if text != '' else ""}{text}")
+    def update_window_title(self, text=""):
+        pygame.display.set_caption("BrokeOut"+
+                                   f"{self.config.release.version} ({self.config.release.state})"+
+                                   " - " if text != '' else ""+
+                                   text)
 
     def update(self):
         self.scene_manager.update()
@@ -34,23 +39,19 @@ class Game:
         self.logger.log("Initialising Pygame window")
         pygame.init()
 
-        window = pygame.display.set_mode(
-            (WINDOW_WIDTH, WINDOW_HEIGHT),
+        self.window = pygame.display.set_mode(
+            (self.config.graphics.window.width, self.config.graphics.window.height),
             pygame.OPENGL | pygame.DOUBLEBUF
         )
-        self.window = pygame.Surface(window.get_size(), pygame.SRCALPHA, 32)
+
         self.update_window_title()
 
         pygame.mouse.set_visible(False)
 
         self.clock = pygame.time.Clock()
 
-        if DEBUG_DISABLE_SPLASH:
-            self.active_scene = self.scene_manager.set_active_scene("menu")
-        elif DEBUG_STARTUP_GAME:
-            self.active_scene = self.scene_manager.set_active_scene("level")
-        elif DEBUG_DEVELOPER_SCENE:
-            self.active_scene = self.scene_manager.set_active_scene("development")
+        if self.config.debug.startup.scene != "default":
+            self.active_scene = self.scene_manager.set_active_scene(self.config.debug.startup.scene)
         else:
             self.active_scene = self.scene_manager.set_active_scene("splash")
 
@@ -62,7 +63,7 @@ class Game:
             self.update()
             self.draw()
             pygame.display.flip()
-            self.clock.tick(TARGET_FPS)
+            self.clock.tick(self.config.graphics.fps)
 
         self.logger.highlight(f"Have a nice day :3")
 

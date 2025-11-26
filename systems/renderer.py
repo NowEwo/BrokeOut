@@ -3,9 +3,9 @@
 import moderngl
 import numpy as np
 import pygame
+import time
 
 from core.context import Context
-from settings import *
 from systems.logging import Logger
 
 
@@ -13,32 +13,34 @@ class Renderer(Context):
     def __init__(self, shader_name: str | None = None) -> None:
         self.logger = Logger("systems.renderer")
         super().__init__()
-        self.shader_name = shader_name if DEBUG_ENABLED_SHADERS else ""
+        self.shader_name = shader_name if self.game.config.debug.shaders else ""
         self.ctx = moderngl.create_context()
+        self.ctx.gc_mode = "auto"
+        self.start_time = time.time()
         self.setup_shaders()
         self.logger.success(f"Renderer instance {self} initialised")
 
+        self.update_values = True
+        self.last_warp = 0.0
+
     def change_shader(self, shader_name: str) -> None:
-        self.shader_name = shader_name
-        self.setup_shaders()
+        if self.shader_name != shader_name:
+            self.shader_name = shader_name
+            self.setup_shaders()
 
     def setup_shaders(self):
-        """Initialize OpenGL shaders"""
         if self.shader_name:
             with open(f"shaders/{self.shader_name}.glsl") as f:
                 frag_shader_src = f.read()
         else:
             frag_shader_src = """
             #version 330 core
-            
+
             uniform sampler2D iChannel0;
-            uniform vec2 iResolution;
-            uniform float warp;
-            uniform float scan;
-            
+
             in vec2 v_texcoord;
             out vec4 fragColor;
-            
+
             void main() {
                 fragColor = texture(iChannel0, v_texcoord);
             }
@@ -46,15 +48,22 @@ class Renderer(Context):
 
         vertex_shader_src = """
         #version 330 core
-        
+
         in vec2 in_vert;
         out vec2 v_texcoord;
-        
+
         void main() {
             v_texcoord = (in_vert + 1.0) / 2.0;
             gl_Position = vec4(in_vert, 0.0, 1.0);
         }
         """
+
+        if hasattr(self, 'prog'):
+            self.prog.release()
+        if hasattr(self, 'vao'):
+            self.vao.release()
+        if hasattr(self, 'texture'):
+            self.texture.release()
 
         self.prog = self.ctx.program(
             vertex_shader=vertex_shader_src,
@@ -71,21 +80,36 @@ class Renderer(Context):
         vbo = self.ctx.buffer(vertices.tobytes())
         self.vao = self.ctx.simple_vertex_array(self.prog, vbo, "in_vert")
 
-        self.texture = self.ctx.texture((RENDER_WIDTH, RENDER_HEIGHT), 3)
+        self.texture = self.ctx.texture((self.game.config.graphics.render.width,
+                                              self.game.config.graphics.render.height), 3)
         self.texture.repeat_x = False
         self.texture.repeat_y = False
 
-        if "warp" in self.prog:
+        self.has_warp = "warp" in self.prog
+        self.has_scan = "scan" in self.prog
+        self.has_itime = "iTime" in self.prog
+        self.has_iresolution = "iResolution" in self.prog
+        self.has_ichannel0 = "iChannel0" in self.prog
+
+        if self.has_warp:
             self.prog["warp"].value = 0.0
-        if "scan" in self.prog:
+        if self.has_scan:
             self.prog["scan"].value = 0.1
+        if self.has_itime:
+            self.prog["iTime"].value = 0.0
+        if self.has_iresolution:
+            self.prog["iResolution"].value = (self.game.config.graphics.render.width,
+                                              self.game.config.graphics.render.height)
+        if self.has_ichannel0:
+            self.prog["iChannel0"].value = 0
 
         self.logger.success("Shaders initialised")
 
     def set_curvature(self, curvature: float):
-        self.logger.log(f"Screen curvature change requested to {curvature}")
-        if "warp" in self.prog:
+        if self.has_warp and self.last_warp != curvature:
+            self.logger.log(f"Screen curvature change requested to {curvature}")
             self.prog["warp"].value = curvature
+            self.last_warp = curvature
 
     def render_frame(self):
         flipped = pygame.transform.flip(self.game.window, False, True)
@@ -94,19 +118,24 @@ class Renderer(Context):
         self.texture.write(texture_data)
         self.texture.use(0)
 
-        if "iResolution" in self.prog:
-            self.prog["iResolution"].value = (RENDER_WIDTH, RENDER_HEIGHT)
+        if self.has_itime:
+            current_time = time.time() - self.start_time
+            self.prog["iTime"].value = current_time
 
-        if "iChannel0" in self.prog:
-            self.prog["iChannel0"].value = 0
-
-        if "warp" in self.prog:
+        if self.has_warp and self.update_values:
             current_warp = self.prog["warp"].value
             if current_warp < 0.5:
-                self.prog["warp"].value = current_warp + 0.01
-
-        if "scan" in self.prog:
-            self.prog["scan"].value = 0.1
+                new_warp = current_warp + (0.5 - current_warp) * 0.05
+                self.prog["warp"].value = new_warp
+                self.last_warp = new_warp
 
         self.ctx.clear(0.0, 0.0, 0.0)
         self.vao.render(moderngl.TRIANGLE_STRIP)
+
+    def __del__(self):
+        if hasattr(self, 'prog'):
+            self.prog.release()
+        if hasattr(self, 'vao'):
+            self.vao.release()
+        if hasattr(self, 'texture'):
+            self.texture.release()

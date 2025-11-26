@@ -4,12 +4,12 @@ import pygame
 import pygame.freetype
 
 from objects import prototype
-from settings import FONT_SIZE
 
 
 class Button(prototype.Entity):
     def __init__(self, pos, size, text, onclick=None) -> None:
-        self.font = pygame.freetype.Font("assets/fonts/pixelated.ttf", FONT_SIZE)
+        # Pos = (x, y), Size = (x, y), text="str" onclick=function()
+        self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 36)
         self.size = self.base_size = size
         self.text = text
         self.pos = pos
@@ -19,19 +19,21 @@ class Button(prototype.Entity):
 
     def get_collided(self):
         button = pygame.Rect(
-            (self.pos),
+            (self.pos[0]-(self.size[0]//2), self.pos[1]-(self.size[1]//2)),
             (self.size)
         )
         return button.collidepoint(pygame.mouse.get_pos())
 
-    def draw(self, surface, color=(255, 153, 191)):
+    def draw(self, surface, bg_color=(173, 95, 125), fg_color=(246, 172, 201)):
         mouse = pygame.mouse.get_pos()
         button = pygame.Rect(
             (self.pos),
             (self.size)
         )
-        self.text_rect = self.font.get_rect(self.text, size=FONT_SIZE - 10)
+        self.text_rect = self.font.get_rect(self.text, size=21)
         button.center = self.text_rect.center = self.pos
 
-        pygame.draw.rect(surface, (color[0], color[1], color[2], 109 if button.collidepoint(mouse) else 209), button, 0)
-        self.font.render_to(surface, self.text_rect, self.text, [c // 3 for c in color], size=FONT_SIZE - 10)
+        pygame.draw.rect(surface, (bg_color[0], bg_color[1], bg_color[2], 93 if button.collidepoint(mouse) else 51), button, border_radius=3)
+        for i in range(1, 3):
+            pygame.draw.rect(surface, fg_color, (self.pos[0] - (self.size[0]//2) + 3 - i, self.pos[1] - (self.size[1]//2) + 3 - i, self.size[0], self.size[1]), 1, border_radius=2)
+        self.font.render_to(surface, self.text_rect, self.text, [c for c in fg_color], size=21)

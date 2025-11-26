@@ -4,16 +4,15 @@ import pygame
 import pygame.freetype
 
 from objects.prototype import Entity
-from settings import VERSION, RELEASE_STATE
 
 
 class Credits(Entity):
     def __init__(self) -> None:
         super().__init__()
-        self.font = pygame.freetype.Font("assets/fonts/pixelated.ttf", 24)
+        self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 19)
         self.text = [
             "Broke Out - By Broke Team (2025)",
-            f"Version {VERSION} ({RELEASE_STATE})",
+            f"Version {self.game.config.release.version} ({self.game.config.release.state})",
             "",
             "***Developpement Team***",
             "Ewo", "Titouan Brebion-Coïa", "Eliot Hartel",
@@ -34,6 +33,20 @@ class Credits(Entity):
             "",
             "Made with love by Broke Team", "<3"
         ]
+        self.scroll = 0
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEWHEEL:
+            self.scroll += event.y * 25
+
+    def update(self):
+        target_min = -200 if not self.scene.egg else -1
+        target_max = -25
+
+        if self.scroll < target_min:
+            self.scroll += (target_min - self.scroll) * 0.1
+        elif self.scroll > target_max:
+            self.scroll += (target_max - self.scroll) * 0.1
 
     # noinspection PyMethodOverriding
     def draw(self, scene):
@@ -51,7 +64,7 @@ class Credits(Entity):
             i = 0
             for line in self.text:
                 i += 1
-                text_rect = self.font.get_rect(line, size=24)
+                text_rect = self.font.get_rect(line, size=19)
                 text_rect.center = (scene.surface.get_rect().center[0],
-                                    scene.scroll + scene.surface.get_rect().center[1] // 2 + (i * 25))
-                self.font.render_to(scene.surface, text_rect, line, self.scene.color, size=24)
+                                    self.scroll + scene.surface.get_rect().center[1] // 2 + (i * 25))
+                self.font.render_to(scene.surface, text_rect, line, self.scene.color, size=19)

@@ -9,7 +9,6 @@ class GameContext:
     def get_game(cls):
         return cls._game
 
-
 class Context:
     def __init__(self) -> None:
         self.game = GameContext.get_game()
