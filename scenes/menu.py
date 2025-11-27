@@ -32,8 +32,6 @@ class MenuScene(Scene):
     def run(self):
         self.game.update_window_title("Main Menu")
 
-        self.game.event_manager.subscribe(self, "Quit")
-        self.game.event_manager.subscribe(self, "MouseButtonDown")
         self.game.event_manager.subscribe(self, "KeyDown")
 
         self.shaders = renderer.Renderer("crt")
@@ -60,12 +58,11 @@ class MenuScene(Scene):
         center = self.game.window.get_rect().center
 
         self.menu_buttons = {
-            "Play":    button.Button((center[0], center[1]),           [193, 51], "Play"),
-            "Credits": button.Button((center[0] - 79, center[1] + 59), [151, 51], "Credits"),
-            "Web":     button.Button((center[0] + 79, center[1] + 59), [151, 51], "Website"),
-            "Quit":    button.Button((center[0], center[1] + 118),     [193, 51], "Quit"),
+            "Play":    button.Button((center[0], center[1]),           [193, 51], "Play", self.PlayButtonClick),
+            "Credits": button.Button((center[0] - 79, center[1] + 59), [151, 51], "Credits", self.CreditsButtonClick),
+            "Web":     button.Button((center[0] + 79, center[1] + 59), [151, 51], "Website", self.WebsiteButtonClick),
+            "Quit":    button.Button((center[0], center[1] + 118),     [193, 51], "Quit", self.game.Quit),
         }
-        self.credits_back_button = button.Button((95, 95), [51, 51], "ESC")
 
         self.mousex, self.mousey = 400, 300
         self.scroll = 0
@@ -81,30 +78,19 @@ class MenuScene(Scene):
         self.gradient = pygame.image.load("assets/images/store/gradient0.png").convert_alpha()
         self.gradient_rect = self.gradient.get_rect()
 
-    def Quit(self, event):
-        self.game.running = False
+    def PlayButtonClick(self):
+        if not self.credits:
+            self.game.scene_manager.set_active_scene("level")
 
-    def MouseButtonDown(self, event):
-        if event.button != 1:
-            pass
-        elif self.credits:
-            pass
-        else:
-            if self.menu_buttons["Play"].get_collided():
-                self.game.scene_manager.set_active_scene("level")
-            elif self.menu_buttons["Credits"].get_collided():
-                self.scroll = 0
-                self.egg = random.randint(0, 10) == 5 or self.game.config.debug.misc.easter_egg
-                self.logger.log(f"Switching to credits with easter egg = {self.egg}")
-                self.credits = True
-            elif self.menu_buttons["Web"].get_collided():
-                self.logger.log("Opening website in user's default browser")
-                webbrowser.open("https://nowewo.github.io/BrokeOut/")
-            elif self.menu_buttons["Quit"].get_collided():
-                self.game.running = False
-            elif self.credits_back_button.get_collided():
-                self.logger.log("Disabling credits")
-                self.credits = False
+    def CreditsButtonClick(self):
+        self.scroll = 0
+        self.egg = random.randint(0, 10) == 5 or self.game.config.debug.misc.easter_egg
+        self.logger.log(f"Switching to credits with easter egg = {self.egg}")
+        self.credits = True
+
+    def WebsiteButtonClick(self):
+        self.logger.log("Opening website in user's default browser")
+        webbrowser.open("https://nowewo.github.io/BrokeOut/")
 
     def KeyDown(self, event):
         if event.key == pygame.K_ESCAPE and self.credits:
@@ -163,8 +149,6 @@ class MenuScene(Scene):
             # Credits surface
             self.credits_object.draw(self)
             pygame.draw.rect(self.surface, (bg[0], bg[1], bg[2], 1), (0, 0, self.game.config.graphics.render.width, 131))
-
-            self.credits_back_button.draw(self.surface, self.color)
 
         # Title element ("Broke Out")
         self.text_rect = self.font.get_rect(self.text, size=self.titlesize)

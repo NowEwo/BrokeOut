@@ -17,12 +17,19 @@ class Button(prototype.Entity):
         self.onclick = onclick
         super().__init__()
 
+        self.game.event_manager.subscribe(self, "MouseButtonDown")
+
     def get_collided(self):
         button = pygame.Rect(
             (self.pos[0]-(self.size[0]//2), self.pos[1]-(self.size[1]//2)),
             (self.size)
         )
         return button.collidepoint(pygame.mouse.get_pos())
+
+    def MouseButtonDown(self, event):
+        if self.get_collided() and event.button == 1:
+            if self.onclick is not None:
+                self.onclick()
 
     def draw(self, surface, bg_color=(173, 95, 125), fg_color=(246, 172, 201)):
         mouse = pygame.mouse.get_pos()

@@ -21,12 +21,6 @@ class DevelopmentScene(Scene):
 
         self.game.event_manager.subscribe(self, "WindowFocusLost")
 
-    def handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return False
-        return True
-
     def WindowFocusLost(self, event):
         self.game.running = False
 

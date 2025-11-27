@@ -26,6 +26,9 @@ class Game:
                                    " - " if text != '' else ""+
                                    text)
 
+    def Quit(self, event):
+        self.running = False
+
     def update(self):
         self.scene_manager.update()
 
@@ -33,6 +36,8 @@ class Game:
         self.scene_manager.draw()
 
     def run(self):
+
+        self.event_manager.subscribe(self, "Quit")
 
         self.discordrpc = discord.DiscordRPC()
 

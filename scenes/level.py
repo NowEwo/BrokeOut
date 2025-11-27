@@ -23,7 +23,6 @@ class LevelScene(Scene):
     def run(self):
         self.game.update_window_title("Classic Game")
 
-        self.game.event_manager.subscribe(self, "Quit")
         self.game.event_manager.subscribe(self, "MouseButtonDown")
         self.game.event_manager.subscribe(self, "KeyDown")
 
@@ -83,10 +82,10 @@ class LevelScene(Scene):
         center = self.game.window.get_rect().center
 
         self.pause_buttons = {
-            "Resume": button.Button((center[0], center[1]), [305, 51], "Resume"),
+            "Resume": button.Button((center[0], center[1]), [305, 51], "Resume", lambda: self.__setattr__("pause", False)),
             "Settings": button.Button((center[0] - 77, center[1] + 53), [151, 51], "Settings"),
-            "Quit Game": button.Button((center[0] + 77, center[1] + 53), [151, 51], "Main Menu"),
-            "Quit Desktop": button.Button((center[0], center[1]+106),[305,51], "Exit the game")
+            "Quit Game": button.Button((center[0] + 77, center[1] + 53), [151, 51], "Main Menu", lambda: self.game.scene_manager.set_active_scene("menu")),
+            "Quit Desktop": button.Button((center[0], center[1]+106),[305,51], "Exit the game", lambda: self.game.__setattr__("running", False))
         }
 
         self.game.discordrpc.set_rich_presence("Playing in classic mode", f"Level {self.level}")
@@ -139,9 +138,6 @@ class LevelScene(Scene):
             self.reset_game()
         self.ball.on_player = True
 
-    def Quit(self, event):
-        exit(0)
-
     def MouseButtonDown(self, event):
         if event.button == 1 and self.ball.on_player and not self.pause:
             self.ball.on_player = False
@@ -150,14 +146,6 @@ class LevelScene(Scene):
             if not self.game_started:
                 self.level = 1
                 self.game_started = True
-
-        if self.pause:
-            if self.pause_buttons["Resume"].get_collided():
-                self.pause = False
-            elif self.pause_buttons["Quit Game"].get_collided():
-                self.game.scene_manager.set_active_scene("menu")
-            elif self.pause_buttons["Quit Desktop"].get_collided():
-                self.game.running = False
 
     def KeyDown(self, event):
         if event.key == pygame.K_ESCAPE:
