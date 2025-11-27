@@ -1,3 +1,4 @@
+
 <div align="center">
   <img width="153" height="153" alt="BrokeOut Logo" src="https://github.com/user-attachments/assets/adf1dc4f-75af-4bb6-99d2-17a3b6bb5a0c" />
   
@@ -191,3 +192,4 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 ⬆ [Back to Top](#readme)
 
 </div>
+
