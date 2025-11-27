@@ -156,7 +156,7 @@ class BrickGroup(Entity):
         """Generate brick layout"""
         self.bricks = []
         level = self.scene.levels[(self.scene.level-1)%len(self.scene.levels)]
-        self.logger.warn(f"{level=}")
+        self.logger.log(f"{level=}", "group_verbose")
         for line in range(len(level)):
             for brick in range(len(level[line])):
                 if level[line][brick] != 0 :

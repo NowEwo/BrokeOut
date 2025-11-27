@@ -18,7 +18,7 @@ class Game:
         self.event_manager = event_manager.EventManager()
 
     def handle_events(self):
-        return self.scene_manager.active.handle_events()
+        return self.event_manager.handle_events()
 
     def update_window_title(self, text=""):
         pygame.display.set_caption("BrokeOut"+
@@ -57,9 +57,9 @@ class Game:
 
         self.logger.success(f"Changed current active scene")
 
-        while True:
-            if not self.handle_events():
-                break
+        self.running = True
+        while self.running:
+            self.handle_events()
             self.update()
             self.draw()
             pygame.display.flip()

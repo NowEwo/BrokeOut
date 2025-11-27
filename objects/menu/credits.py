@@ -35,9 +35,10 @@ class Credits(Entity):
         ]
         self.scroll = 0
 
-    def handle_event(self, event):
-        if event.type == pygame.MOUSEWHEEL:
-            self.scroll += event.y * 25
+        self.game.event_manager.subscribe(self, "MouseWheel")
+
+    def MouseWheel(self, event):
+        self.scroll += event.y * 25
 
     def update(self):
         target_min = -200 if not self.scene.egg else -1

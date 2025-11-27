@@ -32,6 +32,10 @@ class MenuScene(Scene):
     def run(self):
         self.game.update_window_title("Main Menu")
 
+        self.game.event_manager.subscribe(self, "Quit")
+        self.game.event_manager.subscribe(self, "MouseButtonDown")
+        self.game.event_manager.subscribe(self, "KeyDown")
+
         self.shaders = renderer.Renderer("crt")
 
         self.mouse = mouse.Mouse()
@@ -77,35 +81,37 @@ class MenuScene(Scene):
         self.gradient = pygame.image.load("assets/images/store/gradient0.png").convert_alpha()
         self.gradient_rect = self.gradient.get_rect()
 
-    def handle_events(self):
-        for event in pygame.event.get():
-            self.credits_object.handle_event(event)
-            if event.type == pygame.QUIT:
-                return False
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not self.credits:
-                if self.menu_buttons["Play"].get_collided():
-                    self.game.scene_manager.set_active_scene("level")
-                elif self.menu_buttons["Credits"].get_collided():
-                    self.scroll = 0
-                    self.egg = random.randint(0, 10) == 5 or self.game.config.debug.misc.easter_egg
-                    self.logger.log(f"Switching to credits with easter egg = {self.egg}")
-                    self.credits = True
-                elif self.menu_buttons["Web"].get_collided():
-                    self.logger.log("Opening website in user's default browser")
-                    webbrowser.open("https://nowewo.github.io/BrokeOut/")
-                elif self.menu_buttons["Quit"].get_collided():
-                    return False
-                elif self.credits_back_button.get_collided():
-                    self.logger.log("Disabling credits")
-                    self.credits = False
+    def Quit(self, event):
+        self.game.running = False
 
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE and self.credits:
-                    self.logger.log("Disabling credits")
-                    self.credits = False
-                if event.key == pygame.K_SPACE:
-                    self.game.scene_manager.set_active_scene("menu", False)
-        return True
+    def MouseButtonDown(self, event):
+        if event.button != 1:
+            pass
+        elif self.credits:
+            pass
+        else:
+            if self.menu_buttons["Play"].get_collided():
+                self.game.scene_manager.set_active_scene("level")
+            elif self.menu_buttons["Credits"].get_collided():
+                self.scroll = 0
+                self.egg = random.randint(0, 10) == 5 or self.game.config.debug.misc.easter_egg
+                self.logger.log(f"Switching to credits with easter egg = {self.egg}")
+                self.credits = True
+            elif self.menu_buttons["Web"].get_collided():
+                self.logger.log("Opening website in user's default browser")
+                webbrowser.open("https://nowewo.github.io/BrokeOut/")
+            elif self.menu_buttons["Quit"].get_collided():
+                self.game.running = False
+            elif self.credits_back_button.get_collided():
+                self.logger.log("Disabling credits")
+                self.credits = False
+
+    def KeyDown(self, event):
+        if event.key == pygame.K_ESCAPE and self.credits:
+            self.logger.log("Disabling credits")
+            self.credits = False
+        if event.key == pygame.K_SPACE:
+            self.game.scene_manager.set_active_scene("menu", False)
 
     def compute_surface_offset(self):
         if pygame.mouse.get_focused():

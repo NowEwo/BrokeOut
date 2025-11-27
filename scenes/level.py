@@ -23,6 +23,10 @@ class LevelScene(Scene):
     def run(self):
         self.game.update_window_title("Classic Game")
 
+        self.game.event_manager.subscribe(self, "Quit")
+        self.game.event_manager.subscribe(self, "MouseButtonDown")
+        self.game.event_manager.subscribe(self, "KeyDown")
+
         self.levels = levels
 
         self.audio = audio.AudioEngine()
@@ -135,37 +139,36 @@ class LevelScene(Scene):
             self.reset_game()
         self.ball.on_player = True
 
-    def handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1 and self.ball.on_player and not self.pause:
-                    self.ball.on_player = False
-                    self.ball.set_velocity_by_angle(60)
+    def Quit(self, event):
+        exit(0)
 
-                    if not self.game_started:
-                        self.level = 1
-                        self.game_started = True
+    def MouseButtonDown(self, event):
+        if event.button == 1 and self.ball.on_player and not self.pause:
+            self.ball.on_player = False
+            self.ball.set_velocity_by_angle(60)
 
-                if self.pause:
-                    if self.pause_buttons["Resume"].get_collided():
-                        self.pause = False
-                    elif self.pause_buttons["Quit Game"].get_collided():
-                        self.game.scene_manager.set_active_scene("menu")
-                    elif self.pause_buttons["Quit Desktop"].get_collided():
-                        exit(0)
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    # self.game.scene_manager.set_active_scene("menu")
-                    self.blur_radius = 0
-                    self.pause = not self.pause
+            if not self.game_started:
+                self.level = 1
+                self.game_started = True
 
-                    self.shaders.update_values = not self.shaders.update_values
-                    self.shaders.set_curvature(0)
-                if event.key == pygame.K_SPACE:
-                    self.trigger_next_level()
-        return True
+        if self.pause:
+            if self.pause_buttons["Resume"].get_collided():
+                self.pause = False
+            elif self.pause_buttons["Quit Game"].get_collided():
+                self.game.scene_manager.set_active_scene("menu")
+            elif self.pause_buttons["Quit Desktop"].get_collided():
+                self.game.running = False
+
+    def KeyDown(self, event):
+        if event.key == pygame.K_ESCAPE:
+            # self.game.scene_manager.set_active_scene("menu")
+            self.blur_radius = 0
+            self.pause = not self.pause
+
+            self.shaders.update_values = not self.shaders.update_values
+            self.shaders.set_curvature(0)
+        if event.key == pygame.K_SPACE:
+            self.trigger_next_level()
 
     def update(self):
         # self.color = [random.randint(150,255) for i in range(3)]

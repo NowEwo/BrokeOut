@@ -23,11 +23,17 @@ class SplashScene(Scene):
 
         self.song_played = False
 
+    def run(self):
+        self.game.event_manager.subscribe(self, "Quit")
+
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
         return True
+
+    def Quit(self, event):
+        self.game.running = False
 
     def update(self):
         if self.text_opacity < 255 and self._get_ticks() > 60:

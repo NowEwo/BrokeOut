@@ -2,6 +2,8 @@ from systems.config import config
 
 from datetime import datetime
 
+from systems.config import config
+
 import colorama
 
 
@@ -11,27 +13,48 @@ class Logger:
         if verbose:
             self.log(f"Logger element created for {name} as {self}")
 
-    def log(self, message) -> None:
-        if config.engine.log_level > 3:
-            print(f"{colorama.Fore.BLUE}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
+    def check_enabled(self, group):
+        r = False
+        if "special.all" in config.debug.logs:
+            if config.debug.logs["special.all"]:
+                r = True
 
-    def highlight(self, message) -> None:
-        if config.engine.log_level > -1:
-            print(
+        if self.name in config.debug.logs:
+            if not config.debug.logs[self.name]:
+                r = False
+            else:
+                r = True
+
+        if not group is None:
+            if self.name+"."+group in config.debug.logs:
+                if not config.debug.logs[self.name+"."+group]:
+                    r = False
+                else:
+                    r = True
+
+        return r
+
+    def log(self, message, group=None) -> None:
+        if config.engine.log_level > 3 and self.check_enabled(group):
+                print(f"{colorama.Fore.BLUE}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
+
+    def highlight(self, message, group=None) -> None:
+        if config.engine.log_level > -1 and self.check_enabled(group):
+               print(
                 f"{colorama.Back.WHITE}{colorama.Fore.BLACK}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}{colorama.Back.RESET}")
 
-    def warn(self, message) -> None:
-        if config.engine.log_level > 2:
-            print(f"{colorama.Fore.YELLOW}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
+    def warn(self, message, group=None) -> None:
+        if config.engine.log_level > 2 and self.check_enabled(group):
+                print(f"{colorama.Fore.YELLOW}({datetime.now()}) [{self.name}{('.'+group) if group else ''}] {message}{colorama.Fore.RESET}")
 
-    def success(self, message) -> None:
-        if config.engine.log_level > 3:
-            print(f"{colorama.Fore.GREEN}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
+    def success(self, message, group=None) -> None:
+        if config.engine.log_level > 3 and self.check_enabled(group):
+                print(f"{colorama.Fore.GREEN}({datetime.now()}) [{self.name}{('.'+group) if group else ''}] {message}{colorama.Fore.RESET}")
 
-    def error(self, message) -> None:
-        if config.engine.log_level > 1:
-            print(f"{colorama.Fore.RED}({datetime.now()}) [{self.name}] {message}{colorama.Fore.RESET}")
+    def error(self, message, group=None) -> None:
+        if config.engine.log_level > 1 and self.check_enabled(group):
+                print(f"{colorama.Fore.RED}({datetime.now()}) [{self.name}{('.'+group) if group else ''}] {message}{colorama.Fore.RESET}")
 
-    def critical(self, message) -> None:
-        if config.engine.log_level > 0:
-            print(f"{colorama.Back.RED}({datetime.now()}) [{self.name}] {message}{colorama.Back.RESET}")
+    def critical(self, message, group=None) -> None:
+        if config.engine.log_level > 0 and self.check_enabled(group):
+                print(f"{colorama.Back.RED}({datetime.now()}) [{self.name}{('.'+group) if group else ''}] {message}{colorama.Back.RESET}")

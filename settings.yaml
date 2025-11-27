@@ -51,8 +51,15 @@ debug:
     autoplay: false
 
   misc:
-    error_handler: true
+    error_handler: false
     easter_egg: false
+
+  logs:
+    special.all: true
+    core.event_manager.event_name: false
+    core.event_manager.verbose: false
+    systems.renderer: false
+    objects.brick.brickgroup.group_verbose: false
 
 engine:
   # -1: No logs
