@@ -79,10 +79,10 @@ uv run main.py
 
 **Who said a breakout game can't be sexy?**
 
-<img width="794" alt="Gameplay Screenshot 1" src="https://github.com/user-attachments/assets/6271f83b-ea48-467e-9968-74cbf45b6180" />
+<img width="810" height="607" alt="image" src="https://github.com/user-attachments/assets/cf7ad36b-1425-4061-9ca7-7d603d3a1ead" />
 <p><i>Menu screen</i></p>
 
-<img width="794" alt="Gameplay Screenshot 2" src="https://github.com/user-attachments/assets/1b780740-590a-4ee8-b96c-404c7adc1500" />
+<img width="815" height="610" alt="image" src="https://github.com/user-attachments/assets/0737ec63-b5ac-423e-8a8f-6eda1ffaadb7" />
 <p><i>The actual game</i></p>
 
 </div>
