@@ -12,7 +12,7 @@ class Mouse(prototype.Entity):
         self.i = 1
         super().__init__()
 
-    def draw(self):
+    def draw(self) -> None:
         if pygame.mouse.get_focused():
             mousex, mousey = pygame.mouse.get_pos()
             if self.game.config.debug.precise_mouse:

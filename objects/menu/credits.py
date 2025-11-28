@@ -10,7 +10,7 @@ class Credits(Entity):
     def __init__(self) -> None:
         super().__init__()
         self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 19)
-        self.text = [
+        self.text: list[str] = [
             "Broke Out - By Broke Team (2025)",
             f"Version {self.game.config.release.version} ({self.game.config.release.state})",
             "",
@@ -33,14 +33,14 @@ class Credits(Entity):
             "",
             "Made with love by Broke Team", "<3"
         ]
-        self.scroll = 0
+        self.scroll: int = 0
 
         self.game.event_manager.subscribe(self, "MouseWheel")
 
-    def MouseWheel(self, event):
+    def MouseWheel(self, event) -> None:
         self.scroll += event.y * 25
 
-    def update(self):
+    def update(self) -> None:
         target_min = -200 if not self.scene.egg else -1
         target_max = -25
 
@@ -50,7 +50,7 @@ class Credits(Entity):
             self.scroll += (target_max - self.scroll) * 0.1
 
     # noinspection PyMethodOverriding
-    def draw(self, scene):
+    def draw(self, scene) -> None:
 
         if scene.egg:
             image = pygame.image.load("assets/images/credits/egg.png")

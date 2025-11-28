@@ -15,7 +15,7 @@ class SceneManager(context.Context):
         self.scene_cache = {}  # Cache optionnel pour recharger plus vite
         super().__init__()
 
-    def set_active_scene(self, scene_name: str, use_cache: bool = True):
+    def set_active_scene(self, scene_name: str, use_cache: bool = True) -> Scene:
         """Charge et active une scène par son nom"""
         self.logger.log(f"Changing active scene to '{scene_name}'")
 
@@ -58,14 +58,11 @@ class SceneManager(context.Context):
         self.active.run()
         return self.active
 
-    def handle_events(self):
-        return self.active.handle_events()
-
-    def update(self):
+    def update(self) -> None:
         self.active._runtime_timer += 1
         self.active.update()
 
-    def draw(self):
+    def draw(self) -> None:
         self.active.draw()
 
 
@@ -74,29 +71,24 @@ class Scene(context.Context):
     def __init__(self) -> None:
         self.logger = logging.Logger("core.scene_manager.scene")
         self._runtime_timer = 0.0
+        self.layers = {}
         super().__init__()
         self.logger.success(f"New scene loaded as {self}")
 
-    def handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return False
-        return True
-
-    def run(self):
+    def run(self) -> None:
         self.logger.log(f"Scene {self} now running")
 
-    def inactive(self):
+    def inactive(self) -> None:
         self.logger.log(f"Scene {self} now inactive")
         if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
             pygame.mixer.music.stop()
         self._runtime_timer = 0
 
-    def _get_ticks(self):
+    def _get_ticks(self) -> float:
         return self._runtime_timer
 
-    def update(self):
+    def update(self) -> None:
         pass
 
-    def draw(self):
+    def draw(self) -> None:
         pass

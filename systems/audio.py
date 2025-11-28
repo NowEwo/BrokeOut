@@ -1,15 +1,16 @@
 import pygame.mixer
 
 from systems.logging import Logger
-
+from systems.config import config
 
 class AudioEngine:
     def __init__(self) -> None:
-        self.logger = Logger("systems.audio")
+        self.logger: Logger = Logger("systems.audio")
+
+        self.current_volume: float = config.audio.volume.master
+        self.requested_volume: float = self.current_volume
 
         pygame.mixer.init()
-        self.current_volume = 1.0
-        self.requested_volume = 1.0
 
         self.logger.success(f"New AudioEngine initialised : {self}")
 
@@ -21,11 +22,11 @@ class AudioEngine:
         else:
             self.logger.error("AudioEngine busy, cannot play music file")
 
-    def set_volume(self, volume) -> None:
-        self.logger.log("Volume change requested : " + volume)
+    def set_volume(self, volume: float) -> None:
+        self.logger.log(f"Volume change requested from {self.current_volume} to {volume}")
         self.requested_volume = volume
 
-    def toggle(self, loop=False) -> bool:
+    def toggle(self, loop: bool = False) -> bool:
         self.logger.log("Toggling music state")
         if self.state():
             pygame.mixer.music.stop()
@@ -41,7 +42,7 @@ class AudioEngine:
         else:
             self.logger.error("Music not playing, cannot stop")
 
-    def play(self, loop=False) -> None:
+    def play(self, loop: bool = False) -> None:
         self.logger.log("Playing loaded music")
         if not pygame.mixer.music.get_busy():
             pygame.mixer.music.play(-1 if loop else 0)
@@ -49,7 +50,7 @@ class AudioEngine:
             self.logger.warn("AudioEngine busy, stopping the current music")
             pygame.mixer.music.stop()
 
-    def move(self, pos) -> None:
+    def move(self, pos: int) -> None:
         self.logger.log(f"Moving music time to {pos}")
         if self.state():
             pygame.mixer.music.set_pos(pos)

@@ -2,7 +2,7 @@ class GameContext:
     _game = None
 
     @classmethod
-    def set_game(cls, game):
+    def set_game(cls, game) -> None:
         cls._game = game
 
     @classmethod

@@ -16,18 +16,18 @@ class DevelopmentScene(Scene):
 
         super().__init__()
 
-    def run(self):
+    def run(self) -> None:
         self.mouse = mouse.Mouse()
 
         self.game.event_manager.subscribe(self, "WindowFocusLost")
 
-    def WindowFocusLost(self, event):
+    def WindowFocusLost(self, event: pygame.Event) -> None:
         self.game.running = False
 
-    def update(self):
+    def update(self) -> None:
         pass
 
-    def draw(self):
+    def draw(self) -> None:
         self.game.window.fill(self.color)
 
         surface = pygame.Surface(self.game.window.get_size(), pygame.SRCALPHA)

@@ -17,25 +17,27 @@ class Game:
         self.scene_manager = scene_manager.SceneManager()
         self.event_manager = event_manager.EventManager()
 
-    def handle_events(self):
+    def handle_events(self) -> bool:
         return self.event_manager.handle_events()
 
-    def update_window_title(self, text=""):
-        pygame.display.set_caption("BrokeOut"+
-                                   f"{self.config.release.version} ({self.config.release.state})"+
-                                   " - " if text != '' else ""+
-                                   text)
+    def update_window_title(self, text="") -> str:
+        new_title: str = ("BrokeOut"+
+                        f"{self.config.release.version} ({self.config.release.state})"+
+                        (" - " if text != '' else "")+
+                        text)
+        pygame.display.set_caption(new_title)
+        return new_title
 
-    def Quit(self, event):
+    def Quit(self, event) -> None:
         self.running = False
 
-    def update(self):
+    def update(self) -> None:
         self.scene_manager.update()
 
-    def draw(self):
+    def draw(self) -> None:
         self.scene_manager.draw()
 
-    def run(self):
+    def run(self) -> int:
 
         self.event_manager.subscribe(self, "Quit")
 
@@ -73,3 +75,4 @@ class Game:
         self.logger.highlight(f"Have a nice day :3")
 
         pygame.quit()
+        return 0

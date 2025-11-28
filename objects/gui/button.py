@@ -7,35 +7,42 @@ from objects import prototype
 
 
 class Button(prototype.Entity):
-    def __init__(self, pos, size, text, onclick=None) -> None:
+    def __init__(self, pos: tuple | list, size: tuple | list, text: str, onclick: function = None) -> None:
         # Pos = (x, y), Size = (x, y), text="str" onclick=function()
         self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 36)
-        self.size = self.base_size = size
-        self.text = text
-        self.pos = pos
+        self.size: list = size
+        self.text: str = text
+        self.pos: list = pos
 
-        self.onclick = onclick
+        self.onclick: function = onclick
         super().__init__()
 
         self.game.event_manager.subscribe(self, "MouseButtonDown")
 
-    def get_collided(self):
+    def get_collided(self) -> bool:
         button = pygame.Rect(
-            (self.pos[0]-(self.size[0]//2), self.pos[1]-(self.size[1]//2)),
-            (self.size)
+            (
+                self.pos[0]-(self.size[0]//2),
+                self.pos[1]-(self.size[1]//2)
+            ),
+            self.size
         )
         return button.collidepoint(pygame.mouse.get_pos())
 
-    def MouseButtonDown(self, event):
+    def MouseButtonDown(self, event: pygame.Event) -> None:
         if self.get_collided() and event.button == 1:
             if self.onclick is not None:
                 self.onclick()
 
-    def draw(self, surface, bg_color=(173, 95, 125), fg_color=(246, 172, 201)):
+    def draw(self,
+             surface: pygame.Surface,
+             bg_color: tuple | list = (173, 95, 125),
+             fg_color: tuple | list = (246, 172, 201)) -> None:
+
         mouse = pygame.mouse.get_pos()
         button = pygame.Rect(
-            (self.pos),
-            (self.size)
+            self.pos,
+            self.size
         )
         self.text_rect = self.font.get_rect(self.text, size=21)
         button.center = self.text_rect.center = self.pos

@@ -11,24 +11,26 @@ from systems.logging import Logger
 
 class Renderer(Context):
     def __init__(self, shader_name: str | None = None) -> None:
-        self.logger = Logger("systems.renderer")
         super().__init__()
-        self.shader_name = shader_name if self.game.config.debug.shaders else ""
+
+        self.logger: Logger = Logger("systems.renderer")
+
+        self.shader_name: str = shader_name if self.game.config.debug.shaders else ""
         self.ctx = moderngl.create_context()
         self.ctx.gc_mode = "auto"
         self.start_time = time.time()
         self.setup_shaders()
         self.logger.success(f"Renderer instance {self} initialised")
 
-        self.update_values = True
-        self.last_warp = 0.0
+        self.update_values: bool = True
+        self.last_warp: float = 0.0
 
     def change_shader(self, shader_name: str) -> None:
         if self.shader_name != shader_name:
             self.shader_name = shader_name
             self.setup_shaders()
 
-    def setup_shaders(self):
+    def setup_shaders(self) -> None:
         if self.shader_name:
             with open(f"shaders/{self.shader_name}.glsl") as f:
                 frag_shader_src = f.read()
@@ -105,13 +107,13 @@ class Renderer(Context):
 
         self.logger.success("Shaders initialised")
 
-    def set_curvature(self, curvature: float):
+    def set_curvature(self, curvature: float) -> None:
         if self.has_warp and self.last_warp != curvature:
             self.logger.log(f"Screen curvature change requested to {curvature}")
             self.prog["warp"].value = curvature
             self.last_warp = curvature
 
-    def render_frame(self):
+    def render_frame(self) -> None:
         flipped = pygame.transform.flip(self.game.window, False, True)
         texture_data = pygame.image.tostring(flipped, "RGB")
 
@@ -132,7 +134,7 @@ class Renderer(Context):
         self.ctx.clear(0.0, 0.0, 0.0)
         self.vao.render(moderngl.TRIANGLE_STRIP)
 
-    def __del__(self):
+    def __del__(self) -> None:
         if hasattr(self, 'prog'):
             self.prog.release()
         if hasattr(self, 'vao'):

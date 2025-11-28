@@ -11,19 +11,19 @@ class SplashScene(Scene):
     # noinspection PyDefaultArgument
     def __init__(self) -> None:
         super().__init__()
-        self.color = [0, 0, 0]
+        self.color: list[int] = [0, 0, 0]
 
         self.shaders = renderer.Renderer()
-        self.fadeout = 0
-        self.text_opacity = 0
+        self.fadeout: int = 0
+        self.text_opacity: int = 0
 
         self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 36)
-        self.text = "Made with love by Broke Team"
-        self.text_color = [255, 255, 255]
+        self.text: str = "Made with love by Broke Team"
+        self.text_color: list[int] = [255, 255, 255]
 
-        self.song_played = False
+        self.song_played: bool = False
 
-    def update(self):
+    def update(self) -> None:
         if self.text_opacity < 255 and self._get_ticks() > 60:
             self.text_opacity += (255 - self.text_opacity) * 0.1
             if not self.song_played:
@@ -42,7 +42,7 @@ class SplashScene(Scene):
         if self._get_ticks() > 220:
             self.game.scene_manager.set_active_scene("menu")
 
-    def draw(self):
+    def draw(self) -> None:
         self.game.window.fill(self.color)
 
         surface = pygame.Surface(self.game.window.get_size(), pygame.SRCALPHA)

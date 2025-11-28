@@ -7,13 +7,13 @@ from objects import prototype
 
 class StatsElement(prototype.Entity):
     def __init__(self) -> None:
-        self.displayed_score = 0
+        self.displayed_score: int = 0
 
         self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 27)
 
         super().__init__()
 
-    def update(self):
+    def update(self) -> None:
         # Animate score (interpolation)
         if self.displayed_score < self.scene.score:
             diff = (self.scene.score - self.displayed_score) // 2

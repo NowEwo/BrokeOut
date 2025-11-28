@@ -19,6 +19,10 @@ graphics:
   ball:
     trail_length: 15
 
+audio:
+  volume:
+    master: 0.1
+
 # -- Game settings --
 # Settings of the level scene
 # You can change the ball radius, the speed or the number of initial lives

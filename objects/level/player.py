@@ -5,41 +5,47 @@ import pygame
 from core.context import GameContext
 from objects.prototype import Entity
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from objects.level.ball import Ball
 
 class Player(Entity, GameContext):
     def __init__(self) -> None:
         super().__init__()
 
-        self.base_width = self.game.config.game.player.width_multiplier * self.game.config.game.ball.radius
-        self.width = self.base_width
+        self.base_width: int = self.game.config.game.player.width_multiplier * self.game.config.game.ball.radius
+        self.width: int = self.base_width
 
-        self.x = (self.scene.bounds['x_min'] - self.scene.bounds['x_max']) / 2
-        self.y = self.scene.bounds['y_max'] - self.game.config.game.ball.radius - 5
+        self.pos: list[int] = [
+            (self.scene.bounds['x_min'] - self.scene.bounds['x_max']) / 2,
+            self.scene.bounds['y_max'] - self.game.config.game.ball.radius - 5
+        ]
 
-        self.autoplay = self.game.config.debug.game.autoplay
+        self.autoplay: bool = self.game.config.debug.game.autoplay
 
-    def collides_with_ball(self, ball):
+    def collides_with_ball(self, ball: Ball) -> bool:
         """Check collision with ball"""
-        vertical = abs(self.y - ball.y) < 2 * self.game.config.game.ball.radius
-        horizontal = abs(self.x - ball.x) < self.width / 2 + self.game.config.game.ball.radius
+        vertical = abs(self.pos[1] - ball.pos[1]) < 2 * self.game.config.game.ball.radius
+        horizontal = abs(self.pos[0] - ball.pos[0]) < self.width / 2 + self.game.config.game.ball.radius
         return vertical and horizontal
 
-    def update(self):
-        x = pygame.mouse.get_pos()[0] if not self.autoplay else self.scene.ball.x
+    def update(self) -> None:
+        x = pygame.mouse.get_pos()[0] if not self.autoplay else self.scene.ball.pos[0]
         if x - self.width / 2 < self.scene.bounds['x_min']:
-            self.x = self.scene.bounds['x_min'] + self.width / 2
+            self.pos[0] = self.scene.bounds['x_min'] + self.width / 2
         elif x + self.width / 2 > self.scene.bounds['x_max']:
-            self.x = self.scene.bounds['x_max'] - self.width / 2
+            self.pos[0] = self.scene.bounds['x_max'] - self.width / 2
         else:
-            self.x = x
+            self.pos[0] = x
 
         if self.width > self.base_width:
             self.width = self.width - 0.1
 
-    def draw(self):
+    def draw(self) -> None:
         rect = pygame.Rect(
-            int(self.x - self.width / 2 + self.scene.offset_x),
-            int(self.y - self.game.config.game.ball.radius + self.scene.offset_y),
+            int(self.pos[0] - self.width / 2 + self.scene.offset[0]),
+            int(self.pos[1] - self.game.config.game.ball.radius + self.scene.offset[1]),
             self.width,
             2 * self.game.config.game.ball.radius
         )

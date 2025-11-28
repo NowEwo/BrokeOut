@@ -12,7 +12,7 @@ class ErrorHandler(GameContext):
 
         self.logger.success("Registered global error handler")
 
-    def _error_handler(self, exctype, value, traceback):
+    def _error_handler(self, exctype, value, traceback) -> None:
         if exctype is KeyboardInterrupt:
             self.logger.log("Keyboard Interrupt triggered, exiting...")
             self.logger.success("Have a nice day :3")

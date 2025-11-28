@@ -20,36 +20,40 @@ class LevelScene(Scene):
     def __init__(self) -> None:
         super().__init__()
 
-    def run(self):
-        self.game.update_window_title("Classic Game")
+        self.game_started: bool = False
+        self.lives: int = self.game.config.game.initial_lives if not self.game.config.debug.game.infinite_lives else -1
+        self.level: int = 1
+        self.score: int = 0
 
-        self.game.event_manager.subscribe(self, "MouseButtonDown")
-        self.game.event_manager.subscribe(self, "KeyDown")
+        self.levels: list[list] = levels
+        self.level_size: int = np.count_nonzero(self.levels[(self.level - 1) % len(self.levels)])
 
-        self.levels = levels
-
-        self.audio = audio.AudioEngine()
-        self.audio.play_file("assets/sounds/music/audio0.opus", True)
+        self.color: list[int] = [255, 153, 191]
 
         self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 36)
 
-        self.bounds = {
+        self.bounds: dict = {
             "x_min": 0,
             "y_min": 0,
             "x_max": self.game.config.graphics.render.width,
             "y_max": self.game.config.graphics.render.height
         }
 
-        self.game_started = False
-        self.lives = self.game.config.game.initial_lives if not self.game.config.debug.game.infinite_lives else -1
-        self.level = 1
-        self.level_size = np.count_nonzero(self.levels[(self.level - 1) % len(self.levels)])
-        self.score = 0
-
-        self.color = [255, 153, 191]
-
         self.screen_shake = screen_shake.ScreenShake()
-        self.offset_x, self.offset_y = 0, 0
+        self.offset: list[int] = [0, 0]
+
+        self.blur_radius: int = 0
+
+        self.pause: bool = False
+
+    def run(self) -> None:
+        self.game.update_window_title("Classic Game")
+
+        self.game.event_manager.subscribe(self, "MouseButtonDown")
+        self.game.event_manager.subscribe(self, "KeyDown")
+
+        self.audio = audio.AudioEngine()
+        self.audio.play_file("assets/sounds/music/audio0.opus", True)
 
         self.player = player.Player()
         self.ball = ball.Ball()
@@ -61,9 +65,6 @@ class LevelScene(Scene):
         self.stats = [StatsElement(), ProgressBar(), hint.HintElement()]
 
         self.shaders = renderer.Renderer("crt")
-        self.blur_radius = 0
-
-        self.pause = False
 
         pygame.mouse.set_visible(False)
 
@@ -72,16 +73,16 @@ class LevelScene(Scene):
             self.ball.set_velocity_by_angle(60)
             self.game_started = True
 
-        self.LoseMessages = [
+        self.LoseMessages: list[str] = [
             "Oopsie :3", "Maybe do better next time", "Actually that was fun",
             "Ew you don't play very well", "You have to touch the ball actually",
             "Stop being bad, it makes me sad", "-3/10", "Lives are falling like this ball",
             "Try harder :P","nothing beats a jet2 holiday","keep them coming","...",
         ]
 
-        center = self.game.window.get_rect().center
+        center: tuple[int] = self.game.window.get_rect().center
 
-        self.pause_buttons = {
+        self.pause_buttons: dict[str, button.Button] = {
             "Resume": button.Button((center[0], center[1]), [305, 51], "Resume", lambda: self.__setattr__("pause", False)),
             "Settings": button.Button((center[0] - 77, center[1] + 53), [151, 51], "Settings"),
             "Quit Game": button.Button((center[0] + 77, center[1] + 53), [151, 51], "Main Menu", lambda: self.game.scene_manager.set_active_scene("menu")),
@@ -90,10 +91,10 @@ class LevelScene(Scene):
 
         self.game.discordrpc.set_rich_presence("Playing in classic mode", f"Level {self.level}")
 
-    def background_color(self):
+    def background_color(self) -> list:
         return [c // 3 for c in self.color]
 
-    def reset_game(self):
+    def reset_game(self) -> None:
         self.screen_shake.start(10, 5)
 
         self.brick_group.generate_bricks()
@@ -110,7 +111,7 @@ class LevelScene(Scene):
         self.stats[2].show_hint(f"Level {self.level}", size=24)
         self.game.discordrpc.set_rich_presence("Playing in classic mode", f"Level {self.level}")
 
-    def trigger_next_level(self):
+    def trigger_next_level(self) -> None:
         self.level += 1
 
         self.color = [random.randint(150, 255) for _ in range(3)]
@@ -126,7 +127,7 @@ class LevelScene(Scene):
         self.stats[2].show_hint(f"Level {self.level}", size=24)
         self.game.discordrpc.set_rich_presence("Playing in classic mode", f"Level {self.level}")
 
-    def trigger_lose(self):
+    def trigger_lose(self) -> None:
         if self.lives != 1:
             self.stats[2].show_hint(random.choice(self.LoseMessages), size=24)
             self.lives -= 1
@@ -138,7 +139,7 @@ class LevelScene(Scene):
             self.reset_game()
         self.ball.on_player = True
 
-    def MouseButtonDown(self, event):
+    def MouseButtonDown(self, event: pygame.Event) -> None:
         if event.button == 1 and self.ball.on_player and not self.pause:
             self.ball.on_player = False
             self.ball.set_velocity_by_angle(60)
@@ -147,7 +148,7 @@ class LevelScene(Scene):
                 self.level = 1
                 self.game_started = True
 
-    def KeyDown(self, event):
+    def KeyDown(self, event: pygame.Event) -> None:
         if event.key == pygame.K_ESCAPE:
             # self.game.scene_manager.set_active_scene("menu")
             self.blur_radius = 0
@@ -158,7 +159,7 @@ class LevelScene(Scene):
         if event.key == pygame.K_SPACE:
             self.trigger_next_level()
 
-    def update(self):
+    def update(self) -> None:
         # self.color = [random.randint(150,255) for i in range(3)]
 
         if self.blur_radius < 10 and self.pause:
@@ -173,8 +174,8 @@ class LevelScene(Scene):
             for i in self.pause_buttons:
                 self.pause_buttons[i].update()
 
-    def draw(self):
-        self.offset_x, self.offset_y = self.screen_shake.get_offset()
+    def draw(self) -> None:
+        self.offset = self.screen_shake.get_offset()
 
         self.game.window.fill([c // 3 for c in self.color])
 
@@ -185,9 +186,10 @@ class LevelScene(Scene):
         self.player.draw()
         self.ball.draw()
 
-        [i.draw() for i in self.stats]
+        [element.draw()
+         for element in self.stats]
 
-        self.game.window.blit(self.surface, [self.offset_x, self.offset_y])
+        self.game.window.blit(self.surface, self.offset)
 
         if self.pause:
             pause_surface = pygame.Surface(self.game.window.get_size(), pygame.SRCALPHA)
