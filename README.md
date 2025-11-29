@@ -132,7 +132,7 @@ We’re focusing on desktop for now — but mobile could be interesting in the f
 
 <details>
 <summary><b>Will BrokeOut be ported to another language ?</b></summary>
-Because Python's a interpreted language, it has it's own limitation such as performances and incapacity to run on mobie devices natively for example. So our team's currently developping a C++-Based port of BrokeOut, stay tuned :D.
+Because Python's a interpreted language, it has it's own limitation such as performances and incapacity to run on mobile devices natively for example. So our team's currently developping a C++-Based port of BrokeOut, stay tuned :D.
 </details>
 
 ---
