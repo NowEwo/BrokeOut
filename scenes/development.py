@@ -1,14 +1,13 @@
-# type: ignore
-
 import pygame
 import pygame.freetype
 
 from core.scene_manager import Scene
 from systems import renderer
-
 from objects.gui import mouse
 
+
 class DevelopmentScene(Scene):
+
     # noinspection PyDefaultArgument
     def __init__(self) -> None:
         self.color = (159, 0, 0)

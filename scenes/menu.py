@@ -11,7 +11,9 @@ from objects.gui import mouse, button, hint
 from objects.menu import credits
 from systems import renderer, audio, logging
 
+
 class MenuScene(Scene):
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -49,10 +51,24 @@ class MenuScene(Scene):
         center: tuple[int] = self.game.window.get_rect().center
 
         self.menu_buttons: dict[str, button.Button] = {
-            "Play":    button.Button((center[0], center[1]),           [193, 51], "Play", self.PlayButtonClick),
-            "Credits": button.Button((center[0] - 79, center[1] + 59), [151, 51], "Credits", self.CreditsButtonClick),
-            "Web":     button.Button((center[0] + 79, center[1] + 59), [151, 51], "Website", self.WebsiteButtonClick),
-            "Quit":    button.Button((center[0], center[1] + 118),     [193, 51], "Quit", self.game.Quit),
+            "Play": button.Button(
+                (center[0], center[1]), [193, 51], "Play", self.PlayButtonClick
+            ),
+            "Credits": button.Button(
+                (center[0] - 79, center[1] + 59),
+                [151, 51],
+                "Credits",
+                self.CreditsButtonClick,
+            ),
+            "Web": button.Button(
+                (center[0] + 79, center[1] + 59),
+                [151, 51],
+                "Website",
+                self.WebsiteButtonClick,
+            ),
+            "Quit": button.Button(
+                (center[0], center[1] + 118), [193, 51], "Quit", self.game.Quit
+            ),
         }
 
         self.mousex, self.mousey = 400, 300
@@ -63,23 +79,46 @@ class MenuScene(Scene):
         self.text_rect: bool = None
         self.egg: bool = False
 
-        self.game.discordrpc.set_rich_presence("Navigating in menus", f"Breakout Version {self.game.config.release.version}")
+        self.game.discordrpc.set_rich_presence(
+            "Navigating in menus",
+            f"Breakout Version {self.game.config.release.version}",
+        )
         self.hint.show_hint(f"Connected to Discord", 120, 15)
 
-        self.gradient = pygame.image.load("assets/images/store/gradient0.png").convert_alpha()
+        self.gradient = pygame.image.load(
+            "assets/images/store/gradient0.png"
+        ).convert_alpha()
         self.gradient_rect: tuple = self.gradient.get_rect()
 
     def render_background(self, shake: list[int]) -> None:
         background = pygame.Surface(self.game.window.get_size(), pygame.SRCALPHA, 32)
         for line in range(17):
             for column in range(19):
-                pygame.draw.rect(background, (0, 0, 0, 25), (-25 + (column * 51), -40 + (line * 51) - (self._get_ticks()//4)%50, 45, 45))
+                pygame.draw.rect(
+                    background,
+                    (0, 0, 0, 25),
+                    (
+                        -25 + (column * 51),
+                        -40 + (line * 51) - (self._get_ticks() // 4) % 50,
+                        45,
+                        45,
+                    ),
+                )
 
-
-        self.game.window.blit(background,
-                              (1 + ((self.mousex - 400) // 25) + shake[0], 1 + ((self.mousey - 300) // 20) + shake[1]))
-        self.game.window.blit(background,
-                              (1 + ((self.mousex - 400) // 20) + shake[0], 1 + ((self.mousey - 300) // 20) + shake[1]))
+        self.game.window.blit(
+            background,
+            (
+                1 + ((self.mousex - 400) // 25) + shake[0],
+                1 + ((self.mousey - 300) // 20) + shake[1],
+            ),
+        )
+        self.game.window.blit(
+            background,
+            (
+                1 + ((self.mousex - 400) // 20) + shake[0],
+                1 + ((self.mousey - 300) // 20) + shake[1],
+            ),
+        )
 
     def PlayButtonClick(self) -> None:
         if not self.credits:
@@ -128,56 +167,74 @@ class MenuScene(Scene):
         self.hint.update()
 
     def draw(self) -> None:
-        version, name, state = (self.game.config.release.version,
-                                self.game.config.release.compliant_name,
-                                self.game.config.release.state)
+        version, name, state = (
+            self.game.config.release.version,
+            self.game.config.release.compliant_name,
+            self.game.config.release.state,
+        )
 
         shake = self.shake.get_offset()
 
-        bg = [145, 81, 106] # [c // 3 for c in self.color]
+        bg = [145, 81, 106]  # [c // 3 for c in self.color]
         self.game.window.fill(bg)
 
         self.surface = pygame.Surface(self.game.window.get_size(), pygame.SRCALPHA, 32)
 
         if not self.credits:
             # Display main menu
-            [self.menu_buttons[element].draw(self.surface, self.color) for element in self.menu_buttons]
+            [
+                self.menu_buttons[element].draw(self.surface, self.color)
+                for element in self.menu_buttons
+            ]
 
             self.text_rect = self.font.get_rect(f"Version {version} • {name}", size=19)
 
-            self.text_rect.center = (self.surface.get_rect().center[0], self.titley + 51)
-            self.font.render_to(self.surface, self.text_rect, f"Version {version} • {name}", (206, 114, 150),
-                                size=19)
+            self.text_rect.center = (
+                self.surface.get_rect().center[0],
+                self.titley + 51,
+            )
+            self.font.render_to(
+                self.surface,
+                self.text_rect,
+                f"Version {version} • {name}",
+                (206, 114, 150),
+                size=19,
+            )
         else:
             # Credits surface
             self.credits_object.draw(self)
-            pygame.draw.rect(self.surface, (bg[0], bg[1], bg[2], 1), (0, 0, self.game.config.graphics.render.width, 131))
+            pygame.draw.rect(
+                self.surface,
+                (bg[0], bg[1], bg[2], 1),
+                (0, 0, self.game.config.graphics.render.width, 131),
+            )
 
         # Title element ("Broke Out")
         self.text_rect = self.font.get_rect(self.text, size=self.titlesize)
 
-        self.text_rect.center = (self.surface.get_rect().center[0], self.titley+5)
-        self.font.render_to(self.surface, self.text_rect, self.text, (173, 95, 125), size=self.titlesize)
+        self.text_rect.center = (self.surface.get_rect().center[0], self.titley + 5)
+        self.font.render_to(
+            self.surface, self.text_rect, self.text, (173, 95, 125), size=self.titlesize
+        )
 
         self.text_rect.center = (self.surface.get_rect().center[0], self.titley)
-        self.font.render_to(self.surface, self.text_rect, self.text, self.color, size=self.titlesize)
-
-        # Bottom text
-        self.text_rect = self.font.get_rect(f"© 2025 • Broke Team • Version {version} ({state})", size=12)
-        self.text_rect.center = ((self.text_rect.width/2)+15, self.game.config.graphics.render.width - 15)
-
-        self.font.render_to(self.game.window, self.text_rect,
-                            f"© 2025 • Broke Team • Version {version} ({state})", self.color, size=12)
+        self.font.render_to(
+            self.surface, self.text_rect, self.text, self.color, size=self.titlesize
+        )
 
         self.hint.draw()
-
 
         self.render_background(shake)
 
         self.game.window.blit(self.gradient, (0, 0))
 
-        self.game.window.blit(self.surface,
-                              (1 + ((self.mousex - 400) // 10) + shake[0], 1 + ((self.mousey - 300) // 10) + shake[1]))
+        self.game.window.blit(
+            self.surface,
+            (
+                1 + ((self.mousex - 400) // 10) + shake[0],
+                1 + ((self.mousey - 300) // 10) + shake[1],
+            ),
+        )
 
         self.mouse.draw()
 

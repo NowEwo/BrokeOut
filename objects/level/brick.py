@@ -6,6 +6,7 @@ import pygame
 from objects.prototype import Entity
 from systems.logging import Logger
 
+
 class Brick(Entity):
     """Brick object, That's, Ewww, A Brick"""
 
@@ -32,8 +33,13 @@ class Brick(Entity):
         text_rect = self.scene.font.get_rect("•" * self.life, size=16)
         text_rect.center = self.pos
 
-        self.scene.font.render_to(self.scene.surface, text_rect, "•" * self.life, self.scene.background_color(),
-                                  size=16)
+        self.scene.font.render_to(
+            self.scene.surface,
+            text_rect,
+            "•" * self.life,
+            self.scene.background_color(),
+            size=16,
+        )
 
     def get_rect(self, is_skeleton: bool = False) -> pygame.Rect:
         if is_skeleton:
@@ -43,7 +49,8 @@ class Brick(Entity):
         return pygame.Rect(
             int(self.pos[0] - size[0] / 2 + self.scene.offset[0]),
             int(self.pos[1] - size[1] / 2 + self.scene.offset[1]),
-            size[0], size[1]
+            size[0],
+            size[1],
         )
 
     def draw(self) -> None:
@@ -68,7 +75,8 @@ class Brick(Entity):
         rect = pygame.Rect(
             self.pos[0] - self.size[0] / 2,
             self.pos[1] - self.size[1] / 2,
-            self.size[0], self.size[1]
+            self.size[0],
+            self.size[1],
         )
 
         closest_x = max(rect.left, min(ball.pos[0], rect.right))
@@ -77,16 +85,20 @@ class Brick(Entity):
         dx = ball.pos[0] - closest_x
         dy = ball.pos[1] - closest_y
 
-        if (dx * dx + dy * dy) < self.game.config.game.ball.radius ** 2:
+        if (dx * dx + dy * dy) < self.game.config.game.ball.radius**2:
             overlap_x = self.game.config.game.ball.radius - abs(dx)
             overlap_y = self.game.config.game.ball.radius - abs(dy)
 
             if overlap_x < overlap_y:
                 ball.velocity[0] *= -1
-                ball.pos[0] += math.copysign(overlap_x, dx) # overlap_x value but dx sign
+                ball.pos[0] += math.copysign(
+                    overlap_x, dx
+                )  # overlap_x value but dx sign
             else:
                 ball.velocity[1] *= -1
-                ball.pos[1] += math.copysign(overlap_y, dy) # overlap_y value but dy sign
+                ball.pos[1] += math.copysign(
+                    overlap_y, dy
+                )  # overlap_y value but dy sign
 
             self.handle_hit()
 
@@ -97,13 +109,14 @@ class Brick(Entity):
 
         return False
 
+
 class LargeBrick(Brick):
     def __init__(self, pos: list | tuple) -> None:
         super().__init__(pos)
 
     def handle_hit(self) -> None:
-        if self.scene.player.width>=220:
-            self.scene.player.width=220
+        if self.scene.player.width >= 220:
+            self.scene.player.width = 220
         else:
             self.scene.player.width += 50
         self.life = -1
@@ -112,16 +125,18 @@ class LargeBrick(Brick):
         text_rect = self.scene.font.get_rect("<->", size=16)
         text_rect.center = self.pos
 
-        self.scene.font.render_to(self.scene.surface, text_rect, "<->", self.scene.background_color(),
-                                  size=16)
+        self.scene.font.render_to(
+            self.scene.surface, text_rect, "<->", self.scene.background_color(), size=16
+        )
+
 
 class FastBrick(Brick):
     def __init__(self, pos: list | tuple) -> None:
         super().__init__(pos)
 
     def handle_hit(self) -> None:
-        if self.scene.ball.speed>= 16:
-            self.scene.ball.speed =16
+        if self.scene.ball.speed >= 16:
+            self.scene.ball.speed = 16
         else:
             self.scene.ball.speed += 2
         self.life = -1
@@ -130,8 +145,10 @@ class FastBrick(Brick):
         text_rect = self.scene.font.get_rect(">>>", size=16)
         text_rect.center = self.pos
 
-        self.scene.font.render_to(self.scene.surface, text_rect, ">>>", self.scene.background_color(),
-                                  size=16)
+        self.scene.font.render_to(
+            self.scene.surface, text_rect, ">>>", self.scene.background_color(), size=16
+        )
+
 
 class BrickGroup(Entity):
     def __init__(self) -> None:
@@ -145,23 +162,21 @@ class BrickGroup(Entity):
     def generate_bricks(self) -> None:
         """Generate brick layout"""
         self.bricks = []
-        level = self.scene.levels[(self.scene.level-1)%len(self.scene.levels)]
+        level = self.scene.levels[(self.scene.level - 1) % len(self.scene.levels)]
         self.logger.log(f"{level=}", "group_verbose")
         for line in range(len(level)):
             for brick in range(len(level[line])):
-                if level[line][brick] != 0 :
-                    brick = (
-                        level[line][brick]
-                        (
-                            (((line % 2) * 13) + 51 + (brick * 53),
-                            59 + (line * 33))
-                        )
+                if level[line][brick] != 0:
+                    brick = level[line][brick](
+                        (((line % 2) * 13) + 51 + (brick * 53), 59 + (line * 33))
                     )
                     self.bricks.append(brick)
 
     def update(self) -> None:
         if not self.bricks:
-            self.logger.log(f"All bricks are broken, advancing level {self.scene.level}")
+            self.logger.log(
+                f"All bricks are broken, advancing level {self.scene.level}"
+            )
             self.scene.trigger_next_level()
             self.generate_bricks()
 
@@ -179,6 +194,7 @@ class BrickGroup(Entity):
             else:
                 self.bricks.remove(brick)
 
+
 class BricksSkeleton(Entity):
     def __init__(self) -> None:
         super().__init__()
@@ -186,18 +202,14 @@ class BricksSkeleton(Entity):
         self.logger: Logger = Logger("objects.brick.bricks_skeleton")
         self.bricks: list = []
 
-        self.level: list = self.scene.levels[self.scene.level%len(self.scene.levels)]
+        self.level: list = self.scene.levels[self.scene.level % len(self.scene.levels)]
 
         self.logger.log("Initialised brick group")
         for line in range(len(self.level)):
             for brick in range(len(self.level[line])):
-                if self.level[line][brick] != 0 :
-                    brick = (
-                        self.level[line][brick]
-                        (
-                            (((line % 2) * 13) + 51 + (brick * 53),
-                            59 + (line * 33))
-                        )
+                if self.level[line][brick] != 0:
+                    brick = self.level[line][brick](
+                        (((line % 2) * 13) + 51 + (brick * 53), 59 + (line * 33))
                     )
                     self.bricks.append(brick)
 

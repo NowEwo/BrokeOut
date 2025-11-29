@@ -7,8 +7,10 @@ from objects import prototype
 
 
 class Button(prototype.Entity):
-    def __init__(self, pos: tuple | list, size: tuple | list, text: str, onclick: function = None) -> None:
-        # Pos = (x, y), Size = (x, y), text="str" onclick=function()
+
+    def __init__(
+        self, pos: tuple | list, size: tuple | list, text: str, onclick: function = None
+    ) -> None:
         self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 36)
         self.size: list = size
         self.text: str = text
@@ -21,11 +23,8 @@ class Button(prototype.Entity):
 
     def get_collided(self) -> bool:
         button = pygame.Rect(
-            (
-                self.pos[0]-(self.size[0]//2),
-                self.pos[1]-(self.size[1]//2)
-            ),
-            self.size
+            (self.pos[0] - (self.size[0] // 2), self.pos[1] - (self.size[1] // 2)),
+            self.size,
         )
         return button.collidepoint(pygame.mouse.get_pos())
 
@@ -34,20 +33,48 @@ class Button(prototype.Entity):
             if self.onclick is not None:
                 self.onclick()
 
-    def draw(self,
-             surface: pygame.Surface,
-             bg_color: tuple | list = (173, 95, 125),
-             fg_color: tuple | list = (246, 172, 201)) -> None:
+    def set_event_state(self, enabled: bool):
+        if enabled:
+            self.game.event_manager.subscribe(self, "MouseButtonDown")
+        else:
+            self.game.event_manager.unsubscribe(self, "MouseButtonDown")
+
+    def draw(
+        self,
+        surface: pygame.Surface,
+        bg_color: tuple | list = (173, 95, 125),
+        fg_color: tuple | list = (246, 172, 201),
+    ) -> None:
 
         mouse = pygame.mouse.get_pos()
-        button = pygame.Rect(
-            self.pos,
-            self.size
-        )
+        button = pygame.Rect(self.pos, self.size)
         self.text_rect = self.font.get_rect(self.text, size=21)
         button.center = self.text_rect.center = self.pos
 
-        pygame.draw.rect(surface, (bg_color[0], bg_color[1], bg_color[2], 93 if button.collidepoint(mouse) else 51), button, border_radius=3)
+        pygame.draw.rect(
+            surface,
+            (
+                bg_color[0],
+                bg_color[1],
+                bg_color[2],
+                93 if button.collidepoint(mouse) else 51,
+            ),
+            button,
+            border_radius=3,
+        )
         for i in range(1, 3):
-            pygame.draw.rect(surface, fg_color, (self.pos[0] - (self.size[0]//2) + 3 - i, self.pos[1] - (self.size[1]//2) + 3 - i, self.size[0], self.size[1]), 1, border_radius=2)
-        self.font.render_to(surface, self.text_rect, self.text, [c for c in fg_color], size=21)
+            pygame.draw.rect(
+                surface,
+                fg_color,
+                (
+                    self.pos[0] - (self.size[0] // 2) + 3 - i,
+                    self.pos[1] - (self.size[1] // 2) + 3 - i,
+                    self.size[0],
+                    self.size[1],
+                ),
+                1,
+                border_radius=2,
+            )
+        self.font.render_to(
+            surface, self.text_rect, self.text, [c for c in fg_color], size=21
+        )

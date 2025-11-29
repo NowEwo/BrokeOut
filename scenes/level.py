@@ -1,19 +1,17 @@
-# type: ignore
-
 import random
 
+import numpy as np
 import pygame
 
 from core.scene_manager import Scene
-from effects import screen_shake
-from effects.gaussian_blur import gaussian_blur
+from systems import renderer, audio
 from objects.gui import hint, mouse, button
 from objects.level import player, ball, brick
 from objects.level.stats import StatsElement, ProgressBar
-from systems import renderer, audio
+from effects import screen_shake
+from effects.gaussian_blur import gaussian_blur
 from assets.levels.levels import levels
 
-import numpy as np
 
 class LevelScene(Scene):
 
@@ -21,12 +19,18 @@ class LevelScene(Scene):
         super().__init__()
 
         self.game_started: bool = False
-        self.lives: int = self.game.config.game.initial_lives if not self.game.config.debug.game.infinite_lives else -1
+        self.lives: int = (
+            self.game.config.game.initial_lives
+            if not self.game.config.debug.game.infinite_lives
+            else -1
+        )
         self.level: int = 1
         self.score: int = 0
 
         self.levels: list[list] = levels
-        self.level_size: int = np.count_nonzero(self.levels[(self.level - 1) % len(self.levels)])
+        self.level_size: int = np.count_nonzero(
+            self.levels[(self.level - 1) % len(self.levels)]
+        )
 
         self.color: list[int] = [255, 153, 191]
 
@@ -36,7 +40,7 @@ class LevelScene(Scene):
             "x_min": 0,
             "y_min": 0,
             "x_max": self.game.config.graphics.render.width,
-            "y_max": self.game.config.graphics.render.height
+            "y_max": self.game.config.graphics.render.height,
         }
 
         self.screen_shake = screen_shake.ScreenShake()
@@ -47,6 +51,7 @@ class LevelScene(Scene):
         self.pause: bool = False
 
     def run(self) -> None:
+
         self.game.update_window_title("Classic Game")
 
         self.game.event_manager.subscribe(self, "MouseButtonDown")
@@ -74,22 +79,52 @@ class LevelScene(Scene):
             self.game_started = True
 
         self.LoseMessages: list[str] = [
-            "Oopsie :3", "Maybe do better next time", "Actually that was fun",
-            "Ew you don't play very well", "You have to touch the ball actually",
-            "Stop being bad, it makes me sad", "-3/10", "Lives are falling like this ball",
-            "Try harder :P","nothing beats a jet2 holiday","keep them coming","...",
+            "Oopsie :3",
+            "Maybe do better next time",
+            "Actually that was fun",
+            "Ew you don't play very well",
+            "You have to touch the ball actually",
+            "Stop being bad, it makes me sad",
+            "-3/10",
+            "Lives are falling like this ball",
+            "Try harder :P",
+            "nothing beats a jet2 holiday",
+            "keep them coming",
+            "...",
         ]
 
-        center: tuple[int] = self.game.window.get_rect().center
+        center: tuple[int, int] = self.game.window.get_rect().center
 
         self.pause_buttons: dict[str, button.Button] = {
-            "Resume": button.Button((center[0], center[1]), [305, 51], "Resume", lambda: self.__setattr__("pause", False)),
-            "Settings": button.Button((center[0] - 77, center[1] + 53), [151, 51], "Settings"),
-            "Quit Game": button.Button((center[0] + 77, center[1] + 53), [151, 51], "Main Menu", lambda: self.game.scene_manager.set_active_scene("menu")),
-            "Quit Desktop": button.Button((center[0], center[1]+106),[305,51], "Exit the game", lambda: self.game.__setattr__("running", False))
+            "Resume": button.Button(
+                (center[0], center[1]),
+                [305, 51],
+                "Resume",
+                lambda: self.__setattr__("pause", False),
+            ),
+            "Settings": button.Button(
+                (center[0] - 77, center[1] + 53), [151, 51], "Settings"
+            ),
+            "Quit Game": button.Button(
+                (center[0] + 77, center[1] + 53),
+                [151, 51],
+                "Main Menu",
+                lambda: self.game.scene_manager.set_active_scene("menu"),
+            ),
+            "Quit Desktop": button.Button(
+                (center[0], center[1] + 106),
+                [305, 51],
+                "Exit the game",
+                lambda: self.game.__setattr__("running", False),
+            ),
         }
 
-        self.game.discordrpc.set_rich_presence("Playing in classic mode", f"Level {self.level}")
+        for button_element in self.pause_buttons:
+            self.pause_buttons[button_element].set_event_state(False)
+
+        self.game.discordrpc.set_rich_presence(
+            "Playing in classic mode", f"Level {self.level}"
+        )
 
     def background_color(self) -> list:
         return [c // 3 for c in self.color]
@@ -109,7 +144,9 @@ class LevelScene(Scene):
         self.player.width = self.player.base_width
 
         self.stats[2].show_hint(f"Level {self.level}", size=24)
-        self.game.discordrpc.set_rich_presence("Playing in classic mode", f"Level {self.level}")
+        self.game.discordrpc.set_rich_presence(
+            "Playing in classic mode", f"Level {self.level}"
+        )
 
     def trigger_next_level(self) -> None:
         self.level += 1
@@ -119,13 +156,17 @@ class LevelScene(Scene):
         self.brick_group.generate_bricks()
 
         self.screen_shake.start(10, 5)
-        self.level_size = np.count_nonzero(self.levels[(self.level-1)%len(self.levels)])
+        self.level_size = np.count_nonzero(
+            self.levels[(self.level - 1) % len(self.levels)]
+        )
         self.lives += 4
 
         self.logger.log(f"{self.level_size=}")
 
         self.stats[2].show_hint(f"Level {self.level}", size=24)
-        self.game.discordrpc.set_rich_presence("Playing in classic mode", f"Level {self.level}")
+        self.game.discordrpc.set_rich_presence(
+            "Playing in classic mode", f"Level {self.level}"
+        )
 
     def trigger_lose(self) -> None:
         if self.lives != 1:
@@ -153,6 +194,8 @@ class LevelScene(Scene):
             # self.game.scene_manager.set_active_scene("menu")
             self.blur_radius = 0
             self.pause = not self.pause
+            for button_element in self.pause_buttons:
+                self.pause_buttons[button_element].set_event_state(self.pause)
 
             self.shaders.update_values = not self.shaders.update_values
             self.shaders.set_curvature(0)
@@ -186,8 +229,7 @@ class LevelScene(Scene):
         self.player.draw()
         self.ball.draw()
 
-        [element.draw()
-         for element in self.stats]
+        [element.draw() for element in self.stats]
 
         self.game.window.blit(self.surface, self.offset)
 

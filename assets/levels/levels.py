@@ -8,9 +8,7 @@ levels: list[list] = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FastBrick, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, LargeBrick, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [0, 0, LargeBrick, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
-    [
-        [Brick for i in range(14)] for j in range(7)
-    ]
+    [[Brick for i in range(14)] for j in range(7)],
 ]

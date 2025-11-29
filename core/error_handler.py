@@ -1,3 +1,9 @@
+"""
+core.error_handler - Gestion des erreurs intégrée avec le module systems.logging
+
+EwoFluffy - BrokeTeam - 2025
+"""
+
 import sys
 
 from core.context import GameContext
@@ -5,6 +11,10 @@ from systems.logging import Logger
 
 
 class ErrorHandler(GameContext):
+    """
+    ErrorHandler - Classe à instance unique destinée à gérer les erreurs d'executions
+    """
+
     def __init__(self) -> None:
         self.logger = Logger("components.error_handler")
 
@@ -13,6 +23,10 @@ class ErrorHandler(GameContext):
         self.logger.success("Registered global error handler")
 
     def _error_handler(self, exctype, value, traceback) -> None:
+        """
+        _error_handler - Fonction privée remplaçante de l'error handler par défaut
+        """
+
         if exctype is KeyboardInterrupt:
             self.logger.log("Keyboard Interrupt triggered, exiting...")
             self.logger.success("Have a nice day :3")
@@ -24,4 +38,6 @@ class ErrorHandler(GameContext):
                     continue
                 self.logger.log(f"{key}: {type(value).__name__} = {value}")
             self.logger.highlight("--------- END OF DUMP ---------")
-            self.logger.critical(f"Error of type {exctype.__name__} at context [{value}]")
+            self.logger.critical(
+                f"Error of type {exctype.__name__} at context [{value}]"
+            )

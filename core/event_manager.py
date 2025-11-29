@@ -1,13 +1,26 @@
-from objects.prototype import Entity
-from systems.logging import Logger
-import pygame
+"""
+core.event_manager - Gestionnaire d'évènements de BrokeEngine
+
+EwoFluffy - BrokeTeam - 2025
+"""
 
 from typing import TYPE_CHECKING
+
+import pygame
+
+from objects.prototype import Entity
+from systems.logging import Logger
 
 if TYPE_CHECKING:
     from core.engine import Game
 
+
 class EventManager:
+    """
+    EventManager - Classe du gestionnaire d'évènements , permet d'envoyer modulairement des appels aux fonctions
+    selon les évènements de PyGame ainsi que la création d'évènements personnalisés et dynamiquement
+    """
+
     def __init__(self) -> None:
         self.listeners = {}
         self.logger = Logger("core.event_manager")
@@ -15,13 +28,38 @@ class EventManager:
         self.logger.success("Event manager loaded")
 
     def subscribe(self, listener: Entity | Game, event: str) -> None:
+        """
+        subscribe - Connecter un objet à un évènement
+        La fonction listener.event sera appelée lorsque que celle si sera envoyé d'un autre module
+        """
+
         if not event in self.listeners:
             self.listeners[event] = []
         self.listeners[event].append(listener)
         self.logger.log(f"New subscription from {listener} to event {event}")
         self.logger.log(self.listeners, "verbose")
 
+    def unsubscribe(self, listener: Entity | Game, event: str) -> None:
+        """
+        unsubscribe - Déconnecter un objet d'un évènement
+        L'objet listener arrêtera de récupérer l'évènement event
+        """
+
+        if not event in self.listeners:
+            return
+        if not listener in self.listeners[event]:
+            return
+
+        self.listeners[event].remove(listener)
+
+        self.logger.log(f"subscription from {listener} to removed")
+        self.logger.log(self.listeners, "verbose")
+
     def send_event(self, event: str) -> None:
+        """
+        send_event - Envoyer un évènement a toutes les classes abonnées à l'évènement event
+        """
+
         if not event in self.listeners:
             return
         for entity in self.listeners[event]:
@@ -29,6 +67,10 @@ class EventManager:
             self.logger.log(f"Sent event {event} to object {entity}")
 
     def handle_events(self) -> bool:
+        """
+        handle_events - Connecteur pour le gestionnaire d'évènements de PyGame
+        """
+
         for event in pygame.event.get():
             event_name = pygame.event.event_name(event.type)
             self.logger.log(event_name, "event_name")
@@ -39,4 +81,8 @@ class EventManager:
         return True
 
     def reset(self) -> None:
+        """
+        reset - supprimer toutes les entrées d'évènements
+        """
+
         self.listeners = {}

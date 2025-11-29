@@ -1,4 +1,14 @@
+"""
+core.context - Passer simplement l'objet du jeu à n'importe quel élément
+
+EwoFluffy - BrokeTeam - 2025
+"""
+
 class GameContext:
+    """
+    GameContext - Classe pointant vers le contexte du jeu
+    """
+
     _game = None
 
     @classmethod
@@ -9,7 +19,12 @@ class GameContext:
     def get_game(cls):
         return cls._game
 
+
 class Context:
+    """
+    Context - Classe destinée à être utilisé en classe parent d'entitées et de modules
+    """
+
     def __init__(self) -> None:
         self.game = GameContext.get_game()
         assert type(self.game) is not None

@@ -5,7 +5,9 @@ import pygame.freetype
 
 from objects import prototype
 
+
 class StatsElement(prototype.Entity):
+
     def __init__(self) -> None:
         self.displayed_score: int = 0
 
@@ -23,32 +25,26 @@ class StatsElement(prototype.Entity):
             self.displayed_score -= max(1, diff)
 
     def draw(self):
-        score_text = f'SCORE: {self.displayed_score} | LIFES: {self.scene.lives}'
-        self.font.render_to(
-            self.game.window,
-            (31, 13),
-            score_text,
-            self.scene.color
-        )
+        score_text = f"SCORE: {self.displayed_score} | LIFES: {self.scene.lives}"
+        self.font.render_to(self.game.window, (31, 13), score_text, self.scene.color)
 
 
 class ProgressBar(prototype.Entity):
+
     def __init__(self) -> None:
         self.progress = 0
 
         super().__init__()
 
     def update(self):
-        target = int((1 - (len(self.scene.brick_group.bricks) / self.scene.level_size))
-                     *
-                     self.game.config.graphics.render.width)
+        target = int(
+            (1 - (len(self.scene.brick_group.bricks) / self.scene.level_size))
+            * self.game.config.graphics.render.width
+        )
         speed = 0.1
 
         self.progress += (target - self.progress) * speed
 
     def draw(self):
-        progress_bar = pygame.Rect(
-            0, 0,
-            self.progress, 3
-        )
+        progress_bar = pygame.Rect(0, 0, self.progress, 3)
         pygame.draw.rect(self.game.window, self.scene.color, progress_bar, 0)

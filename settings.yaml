@@ -75,6 +75,6 @@ engine:
   log_level: 4
 
 release:
-  version: "0.1.5"
+  version: "0.1.7"
   state: "BETA"
   compliant_name: "Winter Update"
