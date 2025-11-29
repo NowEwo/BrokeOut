@@ -1,7 +1,7 @@
 [project]
-name = "brokeout-new"
-version = "0.1.0"
-description = "Add your description here"
+name = "broke-out"
+version = "0.1.7"
+description = "BrokeOut game, based on BrokeEngine"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -13,4 +13,9 @@ dependencies = [
     "opencv-python>=4.11.0.86",
     "pyaml>=25.7.0",
     "pygame-ce>=2.5.5",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "."
 ]

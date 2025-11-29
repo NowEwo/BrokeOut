@@ -66,12 +66,7 @@ debug:
     objects.brick.brickgroup.group_verbose: false
 
 engine:
-  # -1: No logs
-  # 0: Highlight
-  # 1: Critical
-  # 2: Error
-  # 3: Warn
-  # 4: Infos, Success
+  # -1: No logs | 0: Highlight | 1: Critical | 2: Error | 3: Warn | 4: Infos, Success
   log_level: 4
 
 release:
