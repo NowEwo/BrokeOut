@@ -6,37 +6,41 @@ from settings import *
 
 import pygame
 
+
 class Game:
     def __init__(self) -> None:
         self.logger = logging.Logger("core.engine")
-        self.error_handler = error_handler.ErrorHandler() if not DEBUG_DISABLE_ERROR_HANDLER else None
+        self.error_handler = (
+            error_handler.ErrorHandler() if not DEBUG_DISABLE_ERROR_HANDLER else None
+        )
 
         context.GameContext.set_game(self)
 
         self.scene_manager = scene_manager.SceneManager()
-    
+
     def handle_events(self):
         return self.scene_manager.active.handle_events()
 
     @staticmethod
     def update_window_title(text=""):
-        pygame.display.set_caption(f"BrokeOut {VERSION} ({RELEASE_STATE}){" - " if text != '' else ""}{text}")
+        pygame.display.set_caption(
+            f"BrokeOut {VERSION} ({RELEASE_STATE}){' - ' if text != '' else ''}{text}"
+        )
 
     def update(self):
         self.scene_manager.update()
+
     def draw(self):
         self.scene_manager.draw()
-    
+
     def run(self):
-        
         self.discordrpc = discord.DiscordRPC()
-        
+
         self.logger.log("Initialising Pygame window")
         pygame.init()
-        
+
         window = pygame.display.set_mode(
-            (WINDOW_WIDTH, WINDOW_HEIGHT),
-            pygame.OPENGL | pygame.DOUBLEBUF
+            (WINDOW_WIDTH, WINDOW_HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF
         )
         self.window = pygame.Surface(window.get_size(), pygame.SRCALPHA, 32)
         self.update_window_title()
@@ -51,12 +55,15 @@ class Game:
         self.menu_scene = menu.MenuScene()
         self.level_scene = level.LevelScene()
 
-        self.active_scene = self.scene_manager.set_active_scene(self.splash_scene if not DEBUG_DISABLE_SPLASH else self.menu_scene)
+        self.active_scene = self.scene_manager.set_active_scene(
+            self.splash_scene if not DEBUG_DISABLE_SPLASH else self.menu_scene
+        )
         if DEBUG_STARTUP_GAME:
             self.active_scene = self.scene_manager.set_active_scene(self.level_scene)
 
         if DEBUG_DEVELOPER_SCENE:
             from scenes.development_scene import DevelopmentScene
+
             self.active_scene = self.scene_manager.set_active_scene(DevelopmentScene())
 
         self.logger.success(f"Changed current active scene")
@@ -68,7 +75,7 @@ class Game:
             self.draw()
             pygame.display.flip()
             self.clock.tick(TARGET_FPS)
-        
+
         self.logger.highlight(f"Have a nice day :3")
 
         pygame.quit()

@@ -1,4 +1,4 @@
-#type: ignore
+# type: ignore
 
 from core.scene_manager import Scene
 from systems import renderer
@@ -41,12 +41,13 @@ class SplashScene(Scene):
                 pygame.mixer.music.play()
         if self._get_ticks() > 120:
             self.text = "(c) • 2025-2026"
-        if self._get_ticks() == 180: self.text_opacity = 0
+        if self._get_ticks() == 180:
+            self.text_opacity = 0
         if self._get_ticks() > 180:
             self.fadeout += (255 - self.fadeout) * 0.03
             self.text_color = [255, 153, 191]
             indice = (self._get_ticks() - 180) // 4
-            self.text = "Broke Out"[0:int(indice)]
+            self.text = "Broke Out"[0 : int(indice)]
         if self._get_ticks() > 220:
             self.game.scene_manager.set_active_scene(self.game.menu_scene)
 
@@ -55,17 +56,26 @@ class SplashScene(Scene):
 
         surface = pygame.Surface(self.game.window.get_size(), pygame.SRCALPHA)
 
-        overlay = pygame.Rect(
-            0, 0,
-            RENDER_WIDTH, RENDER_HEIGHT
+        overlay = pygame.Rect(0, 0, RENDER_WIDTH, RENDER_HEIGHT)
+        pygame.draw.rect(
+            surface, (255 // 3, 153 // 3, 191 // 3, self.fadeout), overlay, 0
         )
-        pygame.draw.rect(surface, (255 // 3, 153 // 3, 191 // 3, self.fadeout), overlay, 0)
 
         text_rect = self.font.get_rect(self.text, size=36)
         text_rect.center = surface.get_rect().center
 
-        self.font.render_to(surface, text_rect, self.text,
-                            (self.text_color[0], self.text_color[1], self.text_color[2], self.text_opacity), size=36)
+        self.font.render_to(
+            surface,
+            text_rect,
+            self.text,
+            (
+                self.text_color[0],
+                self.text_color[1],
+                self.text_color[2],
+                self.text_opacity,
+            ),
+            size=36,
+        )
 
         self.game.window.blit(surface, (0, 0))
 

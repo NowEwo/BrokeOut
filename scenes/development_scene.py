@@ -1,4 +1,4 @@
-#type: ignore
+# type: ignore
 
 from core.scene_manager import Scene
 from systems import renderer
