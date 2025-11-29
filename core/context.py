@@ -4,6 +4,7 @@ core.context - Passer simplement l'objet du jeu à n'importe quel élément
 EwoFluffy - BrokeTeam - 2025
 """
 
+
 class GameContext:
     """
     GameContext - Classe pointant vers le contexte du jeu

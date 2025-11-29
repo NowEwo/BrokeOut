@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 
 
 class Player(Entity, GameContext):
-
     def __init__(self) -> None:
         super().__init__()
 

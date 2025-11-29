@@ -17,7 +17,6 @@ class DiscordRPC:
     """
 
     def __init__(self) -> None:
-
         self.rpc = discordrpc.RPC(app_id=DISCORD_APPLICATION_ID)
 
     def set_rich_presence(self, title: str, text: str) -> None:

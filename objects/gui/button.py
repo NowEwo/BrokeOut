@@ -5,19 +5,21 @@ import pygame.freetype
 
 from objects import prototype
 
+from collection.abc import Callable
+
 
 class Button(prototype.Entity):
-
     def __init__(
-        self, pos: tuple | list, size: tuple | list, text: str, onclick: function = None
+        self, pos: tuple | list, size: tuple | list, text: str, onclick: Callable = None
     ) -> None:
+        super().__init__()
+
         self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 36)
         self.size: list = size
         self.text: str = text
         self.pos: list = pos
 
-        self.onclick: function = onclick
-        super().__init__()
+        self.onclick: Callable = onclick
 
         self.game.event_manager.subscribe(self, "MouseButtonDown")
 
@@ -45,7 +47,6 @@ class Button(prototype.Entity):
         bg_color: tuple | list = (173, 95, 125),
         fg_color: tuple | list = (246, 172, 201),
     ) -> None:
-
         mouse = pygame.mouse.get_pos()
         button = pygame.Rect(self.pos, self.size)
         self.text_rect = self.font.get_rect(self.text, size=21)

@@ -4,7 +4,6 @@ from objects import prototype
 
 
 class Mouse(prototype.Entity):
-
     def __init__(self) -> None:
         self.cursor = pygame.image.load(
             "assets/images/store/cursor.png"

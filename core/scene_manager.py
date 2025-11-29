@@ -18,6 +18,57 @@ from core import context
 from systems import logging
 
 
+class Scene(context.Context):
+    """
+    Scene - Écran du jeu pouvant contenir des entitées
+    """
+
+    def __init__(self) -> None:
+        self.logger = logging.Logger("core.scene_manager.scene")
+        self._runtime_timer = 0.0
+        self.layers = {}
+        super().__init__()
+        self.logger.success(f"New scene loaded as {self}")
+
+    def run(self) -> None:
+        """
+        run - Fonction executée lorsque la scène devient active
+        """
+
+        self.logger.log(f"Scene {self} now running")
+
+    def inactive(self) -> None:
+        """
+        inactive - Fonction executée lorsque la scène va devenir inactive
+        """
+
+        self.logger.log(f"Scene {self} now inactive")
+        if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
+            pygame.mixer.music.stop()
+        self._runtime_timer = 0
+
+    def _get_ticks(self) -> float:
+        """
+        _get_ticks - Retourner le nombre de ticks executée depuis que la scène est active
+        """
+
+        return self._runtime_timer
+
+    def update(self) -> None:
+        """
+        update - Fonction executée à chaque frame pour la logique de la scène
+        """
+
+        pass
+
+    def draw(self) -> None:
+        """
+        draw - Fonction executée à chaque frame pour le rendu de la scène
+        """
+
+        pass
+
+
 class SceneManager(context.Context):
     """
     SceneManager - Orchestrer l'affichage et l'execution des objets Scene
@@ -98,54 +149,3 @@ class SceneManager(context.Context):
         """
 
         self.active.draw()
-
-
-class Scene(context.Context):
-    """
-    Scene - Écran du jeu pouvant contenir des entitées
-    """
-
-    def __init__(self) -> None:
-        self.logger = logging.Logger("core.scene_manager.scene")
-        self._runtime_timer = 0.0
-        self.layers = {}
-        super().__init__()
-        self.logger.success(f"New scene loaded as {self}")
-
-    def run(self) -> None:
-        """
-        run - Fonction executée lorsque la scène devient active
-        """
-
-        self.logger.log(f"Scene {self} now running")
-
-    def inactive(self) -> None:
-        """
-        inactive - Fonction executée lorsque la scène va devenir inactive
-        """
-
-        self.logger.log(f"Scene {self} now inactive")
-        if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
-            pygame.mixer.music.stop()
-        self._runtime_timer = 0
-
-    def _get_ticks(self) -> float:
-        """
-        _get_ticks - Retourner le nombre de ticks executée depuis que la scène est active
-        """
-
-        return self._runtime_timer
-
-    def update(self) -> None:
-        """
-        update - Fonction executée à chaque frame pour la logique de la scène
-        """
-
-        pass
-
-    def draw(self) -> None:
-        """
-        draw - Fonction executée à chaque frame pour le rendu de la scène
-        """
-
-        pass

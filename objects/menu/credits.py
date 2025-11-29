@@ -5,7 +5,6 @@ from objects.prototype import Entity
 
 
 class Credits(Entity):
-
     def __init__(self) -> None:
         super().__init__()
         self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 19)
@@ -32,7 +31,7 @@ class Credits(Entity):
             "",
             "***Special thanks to***",
             "Cantine, Rémi, Sube, Python, UV, Pygame",
-            "And that random guy's website solving a bug in a magic way" "",
+            "And that random guy's website solving a bug in a magic way",
             "Made with love by Broke Team",
             "<3",
         ]
@@ -54,7 +53,6 @@ class Credits(Entity):
 
     # noinspection PyMethodOverriding
     def draw(self, scene) -> None:
-
         if scene.egg:
             image = pygame.image.load("assets/images/credits/egg.png")
             scene.surface.blit(

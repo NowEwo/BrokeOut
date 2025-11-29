@@ -7,7 +7,6 @@ from objects.gui import mouse
 
 
 class DevelopmentScene(Scene):
-
     # noinspection PyDefaultArgument
     def __init__(self) -> None:
         self.color = (159, 0, 0)

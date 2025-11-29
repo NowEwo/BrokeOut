@@ -33,7 +33,7 @@ class EventManager:
         La fonction listener.event sera appelée lorsque que celle si sera envoyé d'un autre module
         """
 
-        if not event in self.listeners:
+        if event not in self.listeners:
             self.listeners[event] = []
         self.listeners[event].append(listener)
         self.logger.log(f"New subscription from {listener} to event {event}")
@@ -45,9 +45,9 @@ class EventManager:
         L'objet listener arrêtera de récupérer l'évènement event
         """
 
-        if not event in self.listeners:
+        if event not in self.listeners:
             return
-        if not listener in self.listeners[event]:
+        if listener not in self.listeners[event]:
             return
 
         self.listeners[event].remove(listener)
@@ -60,7 +60,7 @@ class EventManager:
         send_event - Envoyer un évènement a toutes les classes abonnées à l'évènement event
         """
 
-        if not event in self.listeners:
+        if event not in self.listeners:
             return
         for entity in self.listeners[event]:
             getattr(entity, event)()

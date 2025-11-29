@@ -86,8 +86,7 @@ class Game:
         pygame.init()
 
         self.window = pygame.display.set_mode(
-            (self.config.graphics.window.width,
-             self.config.graphics.window.height),
+            (self.config.graphics.window.width, self.config.graphics.window.height),
             pygame.OPENGL | pygame.DOUBLEBUF,
         )
 
@@ -104,7 +103,7 @@ class Game:
         else:
             self.active_scene = self.scene_manager.set_active_scene("splash")
 
-        self.logger.success(f"Changed current active scene")
+        self.logger.success("Changed current active scene")
 
         while self.running:
             self.handle_events()

@@ -13,11 +13,10 @@ from systems import renderer, audio, logging
 
 
 class MenuScene(Scene):
-
     def __init__(self) -> None:
         super().__init__()
 
-        self.logger: Logger = logging.Logger("scenes.menu")
+        self.logger: logging.Logger = logging.Logger("scenes.menu")
         self.color: list[int] = [246, 172, 201]
 
         self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 36)
@@ -67,7 +66,7 @@ class MenuScene(Scene):
                 self.WebsiteButtonClick,
             ),
             "Quit": button.Button(
-                (center[0], center[1] + 118), [193, 51], "Quit", self.game.Quit
+                (center[0], center[1] + 118), [193, 51], "Quit", self.Quit
             ),
         }
 
@@ -83,12 +82,15 @@ class MenuScene(Scene):
             "Navigating in menus",
             f"Breakout Version {self.game.config.release.version}",
         )
-        self.hint.show_hint(f"Connected to Discord", 120, 15)
+        self.hint.show_hint("Connected to Discord", 120, 15)
 
         self.gradient = pygame.image.load(
             "assets/images/store/gradient0.png"
         ).convert_alpha()
         self.gradient_rect: tuple = self.gradient.get_rect()
+
+    def Quit(self) -> None:
+        self.game.running = False
 
     def render_background(self, shake: list[int]) -> None:
         background = pygame.Surface(self.game.window.get_size(), pygame.SRCALPHA, 32)
@@ -153,7 +155,7 @@ class MenuScene(Scene):
         if self._get_ticks() % 26 == 0 and self.game.config.debug.shaders:
             self.shaders.set_curvature(0.4)
 
-        if self.text_rect != None:
+        if self.text_rect is not None:
             if self.text_rect.center[1] > 100:
                 self.titley += (100 - self.titley) * 0.1
 
@@ -167,10 +169,9 @@ class MenuScene(Scene):
         self.hint.update()
 
     def draw(self) -> None:
-        version, name, state = (
+        version, name = (
             self.game.config.release.version,
             self.game.config.release.compliant_name,
-            self.game.config.release.state,
         )
 
         shake = self.shake.get_offset()

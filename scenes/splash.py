@@ -8,7 +8,6 @@ from systems import renderer
 
 
 class SplashScene(Scene):
-
     # noinspection PyDefaultArgument
     def __init__(self) -> None:
         super().__init__()

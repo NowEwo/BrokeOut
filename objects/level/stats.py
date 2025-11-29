@@ -7,7 +7,6 @@ from objects import prototype
 
 
 class StatsElement(prototype.Entity):
-
     def __init__(self) -> None:
         self.displayed_score: int = 0
 
@@ -30,7 +29,6 @@ class StatsElement(prototype.Entity):
 
 
 class ProgressBar(prototype.Entity):
-
     def __init__(self) -> None:
         self.progress = 0
 

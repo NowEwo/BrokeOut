@@ -2,7 +2,6 @@ from objects.prototype import Entity
 
 
 class HintElement(Entity):
-
     def __init__(self) -> None:
         self.timer: int = 120
         self.hint_text: str = "Click to start game"

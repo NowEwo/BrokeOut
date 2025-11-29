@@ -43,7 +43,7 @@ class Logger:
             else:
                 r = True
 
-        if not group is None:
+        if group is not None:
             if self.name + "." + group in config.debug.logs:
                 if not config.debug.logs[self.name + "." + group]:
                     r = False
@@ -82,7 +82,7 @@ class Logger:
         if config.engine.log_level > 2 and self.check_enabled(group):
             print(
                 f"{colorama.Fore.YELLOW}({datetime.now()})"
-                + f"[{self.name}{('.'+group) if group else ''}] "
+                + f"[{self.name}{('.' + group) if group else ''}] "
                 + f"{message}{colorama.Fore.RESET}"
             )
 
@@ -94,7 +94,7 @@ class Logger:
         if config.engine.log_level > 3 and self.check_enabled(group):
             print(
                 f"{colorama.Fore.GREEN}({datetime.now()})"
-                + f"[{self.name}{('.'+group) if group else ''}] "
+                + f"[{self.name}{('.' + group) if group else ''}] "
                 + f"{message}{colorama.Fore.RESET}"
             )
 
@@ -105,7 +105,7 @@ class Logger:
 
         if config.engine.log_level > 1 and self.check_enabled(group):
             print(
-                f"{colorama.Fore.RED}({datetime.now()}) [{self.name}{('.'+group) if group else ''}] "
+                f"{colorama.Fore.RED}({datetime.now()}) [{self.name}{('.' + group) if group else ''}] "
                 + f"{message}{colorama.Fore.RESET}"
             )
 
@@ -116,6 +116,6 @@ class Logger:
 
         if config.engine.log_level > 0 and self.check_enabled(group):
             print(
-                f"{colorama.Back.RED}({datetime.now()}) [{self.name}{('.'+group) if group else ''}] "
+                f"{colorama.Back.RED}({datetime.now()}) [{self.name}{('.' + group) if group else ''}] "
                 + f"{message}{colorama.Back.RESET}"
             )

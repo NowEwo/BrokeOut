@@ -14,7 +14,6 @@ from assets.levels.levels import levels
 
 
 class LevelScene(Scene):
-
     def __init__(self) -> None:
         super().__init__()
 
@@ -51,7 +50,6 @@ class LevelScene(Scene):
         self.pause: bool = False
 
     def run(self) -> None:
-
         self.game.update_window_title("Classic Game")
 
         self.game.event_manager.subscribe(self, "MouseButtonDown")
