@@ -1,7 +1,0 @@
-#TODO: Dessiner tout les objets a la fois pour éviter une liste de Objet.draw() etc...
-#TODO: Améliorer le gaussian blur
-#TODO: Addons basés sur python (API)
-#TODO: Meilleure lisibilité
-#TODO: Meilleure optipisation
-#TODO: Simplifier le moteur audio
-#TODO: Achivements
