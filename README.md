@@ -60,14 +60,11 @@ uv sync
 uv run main.py
 ````
 
-> ⚠️ **Note:** The current release doesn’t include all gameplay components yet.
-> The complete version will be uploaded within the next few days — stay tuned!
-
 ---
 
 ## 🎮 How to Play
 
-* 🕹️ Move your paddle — Use **arrow keys** or **mouse**
+* 🕹️ Move your paddle — Use **mouse**
 * 💣 Keep the ball in play — Don’t let it fall off the bottom
 * 💥 Break all the bricks — Destroy everything to advance
 * 🏆 Beat your high score — Challenge yourself every round
@@ -90,31 +87,6 @@ uv run main.py
 
 ---
 
-## 🗺️ Roadmap
-
-### 🧩 Near Future (v0.2)
-
-* Actual power-ups
-* Polished sound effects & background music
-* Multiple difficulty levels
-* Local leaderboard system
-
-### ⚙️ Medium Term (v0.3)
-
-* Expanded roguelike mechanics
-* Procedurally generated levels
-* Boss battles
-* Achievement system
-
-### 🚀 Long Term (v1.0)
-
-* Code optimization & performance improvements
-* Multiplayer support
-* Custom level editor
-* Steam/Itch.io release (maybe! 🤞)
-
----
-
 ## 👥 Authors
 
 | Name                                 | Role                               |
@@ -129,33 +101,38 @@ uv run main.py
 ## ❓ FAQ
 
 <details>
-<summary><b>What's the current state of the game?</b></summary>
-Currently in the prototype phase! The core mechanics work, but we're still adding features and polishing gameplay.
+<summary><b>What's the current state of the game ?</b></summary>
+Currently in a very barebone phase! The core mechanics work, but we're still adding features and polishing gameplay.
 </details>
 
 <details>
-<summary><b>Why did you create this?</b></summary>
+<summary><b>Why did you create this ?</b></summary>
 BrokeOut started as a school project. It grew into something we found genuinely fun — and we’re excited to keep developing it!
 </details>
 
 <details>
-<summary><b>Can I contribute to the project?</b></summary>
+<summary><b>Can I contribute to the project ?</b></summary>
 Not yet — it’s currently a school project. Once finished, we plan to open it up for community contributions!
 </details>
 
 <details>
-<summary><b>What platforms does it support?</b></summary>
+<summary><b>What platforms does it support ?</b></summary>
 Built with Python, BrokeOut runs on Windows, macOS, and Linux.
 </details>
 
 <details>
-<summary><b>Is it free?</b></summary>
+<summary><b>Is it free ?</b></summary>
 Absolutely! BrokeOut is and always will be **free and open source**.
 </details>
 
 <details>
-<summary><b>Will there be a mobile version?</b></summary>
+<summary><b>Will there be a mobile version ?</b></summary>
 We’re focusing on desktop for now — but mobile could be interesting in the future!
+</details>
+
+<details>
+<summary><b>Will BrokeOut be ported to another language ?</b></summary>
+Because Python's a interpreted language, it has it's own limitation such as performances and incapacity to run on mobie devices natively for example. So our team's currently developping a C++-Based port of BrokeOut, stay tuned :D.
 </details>
 
 ---
