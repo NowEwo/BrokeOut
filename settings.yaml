@@ -71,5 +71,5 @@ engine:
 
 release:
   version: "0.1.7b"
-  state: "EDGE"
+  state: "UNSTABLE"
   compliant_name: "Winter Update"
