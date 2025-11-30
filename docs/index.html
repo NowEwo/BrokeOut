@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>BrokeOut</title>
   <style>
     @import url('https://fonts.cdnfonts.com/css/upheaval');
 
@@ -71,12 +71,16 @@
   <p>Basically a game about breaking things</p>
   <div class="f-h">
     <button class="dl-btn">Download Now</button>
+    <button class="dl-edge-btn">Download Now (Edge)</button>
     <button class="gh-btn">Visit GitHub</button>
   </div>
 </body>
 <script>
   document.body.querySelector(".dl-btn").onclick = () => {
     document.location.href = "https://github.com/NowEwo/BrokeOut/archive/refs/heads/main.zip";
+  };
+  document.body.querySelector(".dl-edge-btn").onclick = () => {
+    document.location.href = "https://github.com/NowEwo/BrokeOut/archive/refs/heads/edge.zip";
   };
   document.body.querySelector(".gh-btn").onclick = () => {
     document.location.href = "https://github.com/NowEwo/BrokeOut";
