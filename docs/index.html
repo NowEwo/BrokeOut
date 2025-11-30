@@ -6,7 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BrokeOut</title>
   <style>
-    @import url('https://fonts.cdnfonts.com/css/upheaval');
+    @font-face {
+      font-family: 'Monocraft';
+      src: url('Monocraft.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+    }
 
     body {
       display: flex;
@@ -22,7 +25,7 @@
       background-color: #401f2b;
       color: rgb(255, 153, 191);
 
-      font-family: 'Upheaval TT (BRK)', sans-serif;
+      font-family: 'Monocraft', sans-serif;
     }
 
     .f-h {
@@ -40,7 +43,11 @@
 
       font-size: 19px;
 
-      font-family: 'Upheaval TT (BRK)', sans-serif;
+      font-family: 'Monocraft', sans-serif;
+    }
+
+    button.dl-edge-btn{
+        background-color: rgb(255, 255, 255);
     }
 
     button:hover {
@@ -66,14 +73,16 @@
 </head>
 
 <body>
-  <img src="https://github.com/NowEwo/BrokeOut/blob/main/assets/images/Icons/Icon.png?raw=true" alt="Broke Out Icon">
-  <h1>Broke Out</h1>
-  <p>Basically a game about breaking things</p>
-  <div class="f-h">
-    <button class="dl-btn">Download Now</button>
-    <button class="dl-edge-btn">Download Now (Edge)</button>
-    <button class="gh-btn">Visit GitHub</button>
-  </div>
+    <div>
+        <img src="https://github.com/NowEwo/BrokeOut/blob/main/assets/images/Icons/Icon.png?raw=true" alt="Broke Out Icon">
+        <h1>Broke Out</h1>
+        <p>Basically a game about breaking things</p>
+        <div class="f-h">
+            <button class="dl-btn">Download Now</button>
+            <button class="dl-edge-btn">Download Now (Edge)</button>
+            <button class="gh-btn">Visit GitHub</button>
+        </div>
+    </div>
 </body>
 <script>
   document.body.querySelector(".dl-btn").onclick = () => {
