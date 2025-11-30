@@ -12,7 +12,7 @@ class Credits(Entity):
             "Broke Out - By Broke Team (2025)",
             f"Version {self.game.config.release.version} ({self.game.config.release.state})",
             "",
-            "***Developpement Team***",
+            "***Development Team***",
             "Ewo",
             "Titouan Brebion-Coïa",
             "Eliot Hartel",

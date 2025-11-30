@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 import pygame
+import pygame.freetype
 
 from core.scene_manager import Scene
 from systems import renderer, audio
@@ -27,7 +28,7 @@ class LevelScene(Scene):
         self.score: int = 0
 
         self.levels: list[list] = levels
-        self.level_size: int = np.count_nonzero(
+        self.level_size = np.count_nonzero(
             self.levels[(self.level - 1) % len(self.levels)]
         )
 

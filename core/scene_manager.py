@@ -25,7 +25,7 @@ class Scene(context.Context):
 
     def __init__(self) -> None:
         self.logger = logging.Logger("core.scene_manager.scene")
-        self._runtime_timer = 0.0
+        self.runtime_timer = 0.0
         self.layers = {}
         super().__init__()
         self.logger.success(f"New scene loaded as {self}")
@@ -45,14 +45,14 @@ class Scene(context.Context):
         self.logger.log(f"Scene {self} now inactive")
         if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
             pygame.mixer.music.stop()
-        self._runtime_timer = 0
+        self.runtime_timer = 0
 
     def _get_ticks(self) -> float:
         """
         _get_ticks - Retourner le nombre de ticks executée depuis que la scène est active
         """
 
-        return self._runtime_timer
+        return self.runtime_timer
 
     def update(self) -> None:
         """
@@ -71,7 +71,7 @@ class Scene(context.Context):
 
 class SceneManager(context.Context):
     """
-    SceneManager - Orchestrer l'affichage et l'execution des objets Scene
+    SceneManager - Orchestrer l'affichage et l'exécution des objets Scene
     """
 
     def __init__(self) -> None:
@@ -86,7 +86,7 @@ class SceneManager(context.Context):
         set_active_scene - Basculer vers une autre scène
         ---
         params:
-            - scene_name: str = Nom de la scène dans le doccier "scenes/"
+            - scene_name: str = Nom de la scène dans le dossier "scenes/"
             - use_cache: bool = Utiliser le cache de scène pour charger la scène selectionnée
         """
 
@@ -117,13 +117,13 @@ class SceneManager(context.Context):
             )
 
             try:
-                SceneClass = getattr(module, class_name)
+                scene_class = getattr(module, class_name)
             except AttributeError:
                 raise AttributeError(
                     f"The scene '{scene_name}' does not contain a '{class_name}' class."
                 )
 
-            scene = SceneClass()
+            scene = scene_class()
             self.scene_cache[scene_name] = scene
             self.active = scene
             self.logger.success(f"Loaded new scene '{scene_name}'")
@@ -140,7 +140,7 @@ class SceneManager(context.Context):
         update - Mettre à jour la scène actuelle et incrémenter le timer d'execution
         """
 
-        self.active._runtime_timer += 1
+        self.active.runtime_timer += 1
         self.active.update()
 
     def draw(self) -> None:

@@ -11,13 +11,9 @@ import pygame
 from objects.prototype import Entity
 from systems.logging import Logger
 
-if TYPE_CHECKING:
-    from core.engine import Game
-
-
 class EventManager:
     """
-    EventManager - Classe du gestionnaire d'évènements , permet d'envoyer modulairement des appels aux fonctions
+    EventManager - Classe du gestionnaire d'évènements, permet d'envoyer arbitrairement des appels aux fonctions
     selon les évènements de PyGame ainsi que la création d'évènements personnalisés et dynamiquement
     """
 
@@ -27,19 +23,19 @@ class EventManager:
 
         self.logger.success("Event manager loaded")
 
-    def subscribe(self, listener: Entity | Game, event: str) -> None:
+    def subscribe(self, listener, event: str) -> None:
         """
         subscribe - Connecter un objet à un évènement
-        La fonction listener.event sera appelée lorsque que celle si sera envoyé d'un autre module
+        La fonction listener.event sera appelée lorsque que celle-ci sera envoyé d'un autre module
         """
 
         if event not in self.listeners:
             self.listeners[event] = []
         self.listeners[event].append(listener)
         self.logger.log(f"New subscription from {listener} to event {event}")
-        self.logger.log(self.listeners, "verbose")
+        self.logger.log(str(self.listeners), "verbose")
 
-    def unsubscribe(self, listener: Entity | Game, event: str) -> None:
+    def unsubscribe(self, listener, event: str) -> None:
         """
         unsubscribe - Déconnecter un objet d'un évènement
         L'objet listener arrêtera de récupérer l'évènement event
@@ -53,7 +49,7 @@ class EventManager:
         self.listeners[event].remove(listener)
 
         self.logger.log(f"subscription from {listener} to removed")
-        self.logger.log(self.listeners, "verbose")
+        self.logger.log(str(self.listeners), "verbose")
 
     def send_event(self, event: str) -> None:
         """

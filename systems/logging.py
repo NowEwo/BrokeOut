@@ -1,5 +1,5 @@
 """
-systems.loggins - module de gestion des logs
+systems.logging - module de gestion des logs
 
 EwoFluffy - BrokeTeam - 2025
 """
@@ -15,7 +15,7 @@ class Logger:
     Logger - Gestionnaire de logs du projet
     ---
     Le gestionnaire de logs permet d'afficher dynamiquement des logs dans la console du jeu afin
-    de tracer avec précision l'execution de chaque composants de celui-ci
+    de tracer avec précision l'exécution de chaques composants de celui-ci
     """
 
     def __init__(self, name: str = "Logger element", verbose: bool = True) -> None:
@@ -28,8 +28,8 @@ class Logger:
         """
         check_enabled - Vérifier si les logs pour ce composant et ce groupe sont activées
         ---
-        params:
-            - group: str | None = Nom du groupe à vérifier
+        params :
+            - group : str | None = Nom du groupe à vérifier
         """
 
         r = False

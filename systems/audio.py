@@ -14,7 +14,7 @@ class AudioEngine:
     """
     AudioEngine - Moteur audio de BrokeEngine
 
-    Objet de moteur audio, une instance peux être crée dans chaque objet Scene et permet de diffuser
+    Objet de moteur audio, une instance peux être créée dans chaque objet Scene et permet de diffuser
     du son dans le jeu.
     """
 
@@ -32,9 +32,9 @@ class AudioEngine:
         """
         play_file - Jouer un son ou une musique instantanément
         ---
-        params:
-            - file_path: str = Chemin d'accès du fichier sur le disque dur
-            - loop: bool = définir sur vrai permet au son de se jouer en boucle
+        params :
+            - file_path : str = Chemin d'accès du fichier sur le disque dur
+            - loop : bool = définir sur vrai permet au son de se jouer en boucle
             jusqu'à ce qu'un nouveau son soit joué
         """
 

@@ -1,3 +1,4 @@
+<!--suppress ALL -->
 
 <div align="center">
   <img width="153" height="153" alt="BrokeOut Logo" src="https://github.com/user-attachments/assets/adf1dc4f-75af-4bb6-99d2-17a3b6bb5a0c" />
@@ -89,11 +90,11 @@ uv run main.py
 
 ## 👥 Authors
 
-| Name                                 | Role                               |
-| ------------------------------------ | ------------------------           |
-| [@NowEwo](https://github.com/NowEwo) | Lead Developer                     |
-| [@titwix](https://github.com/titwix) | Developer                          |
-| Eliot Hartel                         | Developer                          |
+| Name                                               | Role                 |
+|----------------------------------------------------|----------------------|
+| [@NowEwo](https://github.com/NowEwo)               | Lead Developer       |
+| [@titwix](https://github.com/titwix)               | Developer            |
+| Eliot Hartel                                       | Developer            |
 | [@yamikocrystal](https://github.com/yamikocrystal) | The cute fox drawing |
 
 ---
@@ -132,7 +133,7 @@ We’re focusing on desktop for now — but mobile could be interesting in the f
 
 <details>
 <summary><b>Will BrokeOut be ported to another language ?</b></summary>
-Because Python's a interpreted language, it has it's own limitation such as performances and incapacity to run on mobile devices natively for example. So our team's currently developping a C++-Based port of BrokeOut, stay tuned :D.
+Because Python's an interpreted language, it has its own limitation such as performances and incapacity to run on mobile devices natively for example. So our team's currently developing a C++-Based port of BrokeOut, stay tuned :D.
 </details>
 
 ---
@@ -143,7 +144,7 @@ We’d love to hear from you!
 Whether you found a bug, have an idea, or just want to say hi:
 
 * 📧 **Email:** [contactme@cutefox.dev](mailto:contactme@cutefox.dev)
-* 🐛 **Report bugs:** [GitHub Issues](../../issues)
+* 🐛 **Report bugs:** [GitHub Issues](https://www.github.com/NowEwo/BrokeOut/issues)
 * ⭐ **Like the project?** Give it a star on GitHub!
 
 ---

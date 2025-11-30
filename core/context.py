@@ -23,7 +23,7 @@ class GameContext:
 
 class Context:
     """
-    Context - Classe destinée à être utilisé en classe parent d'entitées et de modules
+    Context - Classe destinée à être utilisé pour donner le contexte du moteur et du jeu à une entitée
     """
 
     def __init__(self) -> None:

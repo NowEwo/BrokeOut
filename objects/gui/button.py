@@ -5,12 +5,10 @@ import pygame.freetype
 
 from objects import prototype
 
-from collection.abc import Callable
-
 
 class Button(prototype.Entity):
     def __init__(
-        self, pos: tuple | list, size: tuple | list, text: str, onclick: Callable = None
+        self, pos: tuple | list, size: tuple | list, text: str, onclick = None
     ) -> None:
         super().__init__()
 
@@ -19,7 +17,7 @@ class Button(prototype.Entity):
         self.text: str = text
         self.pos: list = pos
 
-        self.onclick: Callable = onclick
+        self.onclick = onclick
 
         self.game.event_manager.subscribe(self, "MouseButtonDown")
 

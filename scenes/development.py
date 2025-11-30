@@ -19,7 +19,7 @@ class DevelopmentScene(Scene):
 
         self.game.event_manager.subscribe(self, "WindowFocusLost")
 
-    def WindowFocusLost(self, event: pygame.Event) -> None:
+    def WindowFocusLost(self) -> None:
         self.game.running = False
 
     def update(self) -> None:

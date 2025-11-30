@@ -19,7 +19,7 @@ class Renderer(Context):
     """
     Renderer - Instance du moteur de rendu de BrokeEngine
 
-    Une instance de ce moteur est crée pour chaques objets Scene
+    Une instance de ce moteur est créé pour chaques objets Scene
     """
 
     def __init__(self, shader_name: str | None = None) -> None:

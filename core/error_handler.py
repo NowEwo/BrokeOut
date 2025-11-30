@@ -12,7 +12,7 @@ from systems.logging import Logger
 
 class ErrorHandler(GameContext):
     """
-    ErrorHandler - Classe à instance unique destinée à gérer les erreurs d'executions
+    ErrorHandler - Classe à instance unique destinée à gérer les erreurs d'exécutions
     """
 
     def __init__(self) -> None:
@@ -22,9 +22,9 @@ class ErrorHandler(GameContext):
 
         self.logger.success("Registered global error handler")
 
-    def _error_handler(self, exctype, value, traceback) -> None:
+    def _error_handler(self, exctype, value) -> None:
         """
-        _error_handler - Fonction privée remplaçante de l'error handler par défaut
+        _error_handler - Fonction privée remplaçante de l'error-handler par défaut
         """
 
         if exctype is KeyboardInterrupt:

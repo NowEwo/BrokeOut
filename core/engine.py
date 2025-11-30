@@ -54,7 +54,7 @@ class Game:
         pygame.display.set_caption(new_title)
         return new_title
 
-    def Quit(self, event) -> None:
+    def Quit(self) -> None:
         """
         Quit - fonction d'évènements permettant de fermer le jeu lors de l'évènement Quit de PyGame
         """

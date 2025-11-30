@@ -26,7 +26,7 @@ class Player(Entity, GameContext):
 
         self.autoplay: bool = self.game.config.debug.game.autoplay
 
-    def collides_with_ball(self, ball: Ball) -> bool:
+    def collides_with_ball(self, ball: 'Ball') -> bool:
         """Check collision with ball"""
         vertical = (
             abs(self.pos[1] - ball.pos[1]) < 2 * self.game.config.game.ball.radius
