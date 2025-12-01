@@ -18,6 +18,9 @@ class Game:
         self.config = config
 
         self.logger = logging.Logger("core.engine")
+
+        self.logger.log("Version "+" ".join([self.config.release[i] for i in self.config.release])) # TODO: Make this more readable
+
         self.error_handler = (
             error_handler.ErrorHandler()
             if self.config.debug.misc.error_handler
