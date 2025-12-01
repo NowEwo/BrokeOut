@@ -5,7 +5,7 @@ import pygame
 import pygame.freetype
 
 from core.scene_manager import Scene
-from systems import renderer, audio
+from systems import renderer
 from objects.gui import hint, mouse, button
 from objects.level import player, ball, brick
 from objects.level.stats import StatsElement, ProgressBar
@@ -50,14 +50,13 @@ class LevelScene(Scene):
 
         self.pause: bool = False
 
+        self.game.audio_engine.load_sound("level_theme_0", "music/audio0.wav")
+
     def run(self) -> None:
         self.game.update_window_title("Classic Game")
 
         self.game.event_manager.subscribe(self, "MouseButtonDown")
         self.game.event_manager.subscribe(self, "KeyDown")
-
-        self.audio = audio.AudioEngine()
-        self.audio.play_file("assets/sounds/music/audio0.opus", True)
 
         self.player = player.Player()
         self.ball = ball.Ball()
@@ -99,7 +98,7 @@ class LevelScene(Scene):
                 (center[0], center[1]),
                 [305, 51],
                 "Resume",
-                lambda: self.__setattr__("pause", False),
+                self.toggle_pause,
             ),
             "Settings": button.Button(
                 (center[0] - 77, center[1] + 53), [151, 51], "Settings"
@@ -124,6 +123,8 @@ class LevelScene(Scene):
         self.game.discordrpc.set_rich_presence(
             "Playing in classic mode", f"Level {self.level}"
         )
+
+        self.game.audio_engine.play_sound("level_theme_0", True)
 
     def background_color(self) -> list:
         return [c // 3 for c in self.color]
@@ -179,6 +180,15 @@ class LevelScene(Scene):
             self.reset_game()
         self.ball.on_player = True
 
+    def toggle_pause(self):
+        self.blur_radius = 0
+        self.pause = not self.pause
+        self.game.audio_engine.fade_lowpass(250 if self.pause else 50_000, 0.5)
+        for button_element in self.pause_buttons:
+            self.pause_buttons[button_element].set_event_state(self.pause)
+        self.shaders.update_values = not self.shaders.update_values
+        self.shaders.set_curvature(0)
+
     def MouseButtonDown(self, event: pygame.Event) -> None:
         if event.button == 1 and self.ball.on_player and not self.pause:
             self.ball.on_player = False
@@ -190,14 +200,7 @@ class LevelScene(Scene):
 
     def KeyDown(self, event: pygame.Event) -> None:
         if event.key == pygame.K_ESCAPE:
-            # self.game.scene_manager.set_active_scene("menu")
-            self.blur_radius = 0
-            self.pause = not self.pause
-            for button_element in self.pause_buttons:
-                self.pause_buttons[button_element].set_event_state(self.pause)
-
-            self.shaders.update_values = not self.shaders.update_values
-            self.shaders.set_curvature(0)
+            self.toggle_pause()
         if event.key == pygame.K_SPACE:
             self.trigger_next_level()
 

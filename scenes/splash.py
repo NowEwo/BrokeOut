@@ -24,14 +24,15 @@ class SplashScene(Scene):
 
         self.song_played: bool = False
 
+        self.game.audio_engine.load_sound("splash_sound", "sfx/splash.wav")
+
     def update(self) -> None:
         if self.text_opacity < 255 and self.animation_state:
             self.text_opacity += (255 - self.text_opacity) * 0.1
             if not self.song_played:
                 self.text = "Made with love by Broke Team"
                 self.song_played = True
-                pygame.mixer.music.load("assets/sounds/sfx/splash.mp3")
-                pygame.mixer.music.play()
+                self.game.audio_engine.play_sound("splash_sound")
         if self._get_ticks() == 60:
             self.animation_state = True
         elif self._get_ticks() == 120:

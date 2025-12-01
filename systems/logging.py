@@ -93,7 +93,7 @@ class Logger:
 
         if config.engine.log_level > 3 and self.check_enabled(group):
             print(
-                f"{colorama.Fore.GREEN}({datetime.now()})"
+                f"{colorama.Fore.GREEN}({datetime.now()}) "
                 + f"[{self.name}{('.' + group) if group else ''}] "
                 + f"{message}{colorama.Fore.RESET}"
             )

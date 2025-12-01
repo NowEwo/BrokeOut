@@ -1,133 +1,299 @@
 """
-systems.audio - module de gestion de l'audio
+audio - Moteur audio de BrokeEngine
 
-EwoFluffy - BrokeTeam - 2025
+EwoFluffy - Team Broke - 2025
 """
 
-import pygame.mixer
+from queue import Queue
+import threading
+
+from dataclasses import dataclass
+from typing import Dict
+
+import sounddevice as sd
+import numpy as np
+import wave
 
 from systems.logging import Logger
 from systems.config import config
 
 
+class Reverb:
+    """
+    Reverb - Réverbe basée sur un modèle Schroeder
+    Volontairement simplifié, mais suffisant pour donner de l'immersion.
+    """
+
+    def __init__(self, sample_rate: int):
+        self.sample_rate = sample_rate
+        self.delay = int(0.03 * sample_rate)
+        self.buffer = np.zeros(self.delay, dtype=np.float32)
+        self.index = 0
+
+    def process(self, stereo: np.ndarray, amount: float):
+        if amount <= 0.0:
+            return stereo
+
+        mono = stereo.mean(axis=0)
+        out = np.zeros_like(stereo)
+
+        for i in range(mono.size):
+            delayed = self.buffer[self.index]
+            self.buffer[self.index] = mono[i] + delayed * 0.6
+            mix = mono[i] * (1 - amount) + delayed * amount
+            out[0, i] = mix
+            out[1, i] = mix
+            self.index = (self.index + 1) % self.delay
+
+        return out
+
+
+class Distortion:
+    """
+    Distortion - Simule vaguement (À retravailler) une saturation douce
+    en utilisant une fonction tanh.
+    """
+
+    def process(self, stereo: np.ndarray, drive_db: float):
+        if drive_db <= 0.0:
+            return stereo
+
+        gain = 10 ** (drive_db / 20)
+        boosted = stereo * gain
+        return np.tanh(boosted)
+
+
+class Chorus:
+    """
+    Chorus - Chorus simple utilisant un délai modulé.
+    Inspiré d'un modèle de chorus analogiques de base : LFO (Oscillateur basses fréquences) → délai → mix.
+    """
+
+    def __init__(self, sample_rate: int):
+        self.sr = sample_rate
+        self.max_delay = int(0.02 * sample_rate)
+        self.buffer_l = np.zeros(self.max_delay, dtype=np.float32)
+        self.buffer_r = np.zeros(self.max_delay, dtype=np.float32)
+        self.index = 0
+        self.phase = 0.0
+
+    def process(self, stereo: np.ndarray, amount: float):
+        if amount <= 0.0:
+            return stereo
+
+        out = np.zeros_like(stereo)
+        rate = 0.3
+
+        for i in range(stereo.shape[1]):
+            self.buffer_l[self.index] = stereo[0, i]
+            self.buffer_r[self.index] = stereo[1, i]
+
+            mod = (np.sin(self.phase) + 1) * 0.5
+            delay = int(mod * self.max_delay)
+
+            read = (self.index - delay) % self.max_delay
+            out[0, i] = (stereo[0, i] + self.buffer_l[read] * amount) / 2
+            out[1, i] = (stereo[1, i] + self.buffer_r[read] * amount) / 2
+
+            self.index = (self.index + 1) % self.max_delay
+            self.phase += (2 * np.pi * rate) / self.sr
+
+        return out
+
+
+class Lowpass:
+    """
+    Lowpass - Filtre passe-bas très simple.
+    Pour enlever les aigus ou simuler un effet de distance.
+    """
+
+    def __init__(self, sample_rate: int):
+        self.sr = sample_rate
+        self.prev = np.zeros(2, dtype=np.float32)
+
+    def process(self, stereo: np.ndarray, cutoff: float):
+        if cutoff >= 20000.0: # 20 KHz, inutile d'appliquer l'effet
+            return stereo
+
+        rc = 1.0 / (2 * np.pi * cutoff)
+        dt = 1.0 / self.sr
+        alpha = dt / (rc + dt)
+        out = np.zeros_like(stereo)
+
+        for i in range(stereo.shape[1]):
+            self.prev = self.prev + alpha * (stereo[:, i] - self.prev)
+            out[:, i] = self.prev # Toutes les lignes, colone i
+
+        return out
+
+
+@dataclass
+class AudioEffect:
+    """
+    AudioEffect - Classe qui stocke les valeurs des effets audios
+    """
+    reverb: float = 0.0
+    distortion: float = 0.0
+    chorus: float = 0.0
+    lowpass: float = 20000
+
+
 class AudioEngine:
     """
-    AudioEngine - Moteur audio de BrokeEngine
-
-    Objet de moteur audio, une instance peux être créée dans chaque objet Scene et permet de diffuser
-    du son dans le jeu.
+    AudioEngine - Moteur audio de BrokeEngine (version sans Pedalboard)
     """
 
-    def __init__(self) -> None:
-        self.logger: Logger = Logger("systems.audio")
+    def __init__(self, sample_rate=44100, block_size=512):
+        self.logger = Logger("systems.audio")
 
-        self.current_volume: float = config.audio.volume.master
-        self.requested_volume: float = self.current_volume
+        self.sample_rate = sample_rate
+        self.block_size = block_size
+        self.sounds: Dict[str, np.ndarray] = {}
+        self.playing_sounds = []
+        self.stream = None
 
-        pygame.mixer.init()
+        self.effects = AudioEffect()
 
-        self.logger.success(f"New AudioEngine initialised : {self}")
+        self.reverb = Reverb(sample_rate)
+        self.distortion = Distortion()
+        self.chorus = Chorus(sample_rate)
+        self.lowpass = Lowpass(sample_rate)
 
-    def play_file(self, file_path: str, loop=False) -> None:
-        """
-        play_file - Jouer un son ou une musique instantanément
-        ---
-        params :
-            - file_path : str = Chemin d'accès du fichier sur le disque dur
-            - loop : bool = définir sur vrai permet au son de se jouer en boucle
-            jusqu'à ce qu'un nouveau son soit joué
-        """
+        self.lock = threading.Lock()
+        self.command_queue = Queue()
 
-        pygame.mixer.music.load(file_path)
-        if not pygame.mixer.music.get_busy():
-            self.logger.log(f"Playing audio file {file_path} with {loop=}")
-            pygame.mixer.music.play(-1 if loop else 0)
-        else:
-            self.logger.error("AudioEngine busy, cannot play music file")
+        self.audio_thread = None
+        self.running = False
 
-    def set_volume(self, volume: float) -> None:
-        """
-        set_volume - Changer le volume du son avec un effet de fondu fluide
-        ---
-        params:
-            - volume: float = Volume final du son
-        """
+    def load_sound(self, name: str, filepath: str):
+        try:
+            with wave.open("assets/sounds/"+filepath, 'rb') as wf:
+                frames = wf.readframes(wf.getnframes())
+                audio = np.frombuffer(frames, dtype=np.int16).astype(np.float32)
+                audio /= 32768.0 # Normalisation de l'audio
 
-        self.logger.log(
-            f"Volume change requested from {self.current_volume} to {volume}"
+                if wf.getnchannels() == 1:
+                    audio = np.stack([audio, audio])
+                else:
+                    audio = audio.reshape(-1, 2).T
+
+                with self.lock:
+                    self.sounds[name] = audio
+
+                self.logger.log(f"Loaded sound: {name}")
+                return True
+
+        except Exception as e:
+            self.logger.error(f"Error loading {name}: {e}")
+            return False
+
+    def play_sound(self, name: str, loop=False, volume=config.audio.volume.master):
+        if name not in self.sounds:
+            self.logger.error(f"Sound doesn't exists: {name}")
+            return
+
+        with self.lock:
+            self.playing_sounds.append({
+                'data': self.sounds[name] * volume,
+                'position': 0,
+                'loop': loop
+            })
+
+    def stop_all(self):
+        with self.lock:
+            self.playing_sounds.clear()
+
+    def audio_callback(self, outdata, frames, time_info, status):
+        if status:
+            self.logger.warn(f"Audio status: {status}")
+
+        mixed = np.zeros((2, frames), dtype=np.float32)
+
+        with self.lock:
+            for sound in self.playing_sounds[:]:
+                data = sound['data']
+                pos = sound['position']
+                remain = data.shape[1] - pos
+
+                if remain <= 0:
+                    if sound['loop']:
+                        sound['position'] = 0
+                        continue
+                    else:
+                        self.playing_sounds.remove(sound)
+                        continue
+
+                to_copy = min(frames, remain)
+                mixed[:, :to_copy] += data[:, pos:pos + to_copy]
+                sound['position'] += to_copy
+
+        x = mixed
+        x = self.distortion.process(x, self.effects.distortion)
+        x = self.chorus.process(x, self.effects.chorus)
+        x = self.reverb.process(x, self.effects.reverb)
+        x = self.lowpass.process(x, self.effects.lowpass)
+
+        x = np.clip(x, -1.0, 1.0)
+        outdata[:] = x.T
+
+    def start(self):
+        if self.running:
+            self.logger.warn("Audio engine already running")
+            return
+
+        self.running = True
+        self.stream = sd.OutputStream(
+            samplerate=self.sample_rate,
+            blocksize=self.block_size,
+            channels=2,
+            callback=self.audio_callback
         )
-        self.requested_volume = volume
+        self.stream.start()
+        self.logger.success("Audio engine successfully initialized")
 
-    def toggle(self, loop: bool = False) -> bool:
-        """
-        toggle - Basculer le status du son
-        ---
-        params:
-            - loop: bool = Rejouer le son en boucle si le mode est reprise
-        """
+    def stop(self):
+        self.running = False
+        if self.stream:
+            self.stream.stop()
+            self.stream.close()
+            self.stream = None
 
-        self.logger.log("Toggling music state")
-        if self.state():
-            pygame.mixer.music.stop()
-        else:
-            pygame.mixer.music.play(-1 if loop else 0)
+        self.logger.log("Audio engine stopped")
 
-        return self.state()
+    def set_reverb(self, amount: float):
+        self.effects.reverb = max(0.0, min(1.0, amount))
+        self.logger.log(f"Reverb effect set to {amount}")
 
-    def stop(self) -> None:
-        """
-        stop - Arrêter le son en cour de diffusion
-        """
+    def set_distortion(self, amount: float):
+        self.effects.distortion = max(0.0, min(40.0, amount))
+        self.logger.log(f"Distrortion effect set to {amount}")
 
-        self.logger.log("Stopping music")
-        if pygame.mixer.music.get_busy():
-            pygame.mixer.music.stop()
-        else:
-            self.logger.error("Music not playing, cannot stop")
+    def set_chorus(self, amount: float):
+        self.effects.chorus = max(0.0, min(1.0, amount))
+        self.logger.log(f"Chorus effect set to {amount}")
 
-    def play(self, loop: bool = False) -> None:
-        """
-        play - Mettre le son en route
-        ---
-        params:
-            - loop: bool = Définir le mode boucle
-        """
+    def set_lowpass(self, frequency: float):
+        self.effects.lowpass = max(20.0, min(20000.0, frequency))
+        self.logger.log(f"Lowpass effect set to {frequency}")
 
-        self.logger.log("Playing loaded music")
-        if not pygame.mixer.music.get_busy():
-            pygame.mixer.music.play(-1 if loop else 0)
-        else:
-            self.logger.warn("AudioEngine busy, stopping the current music")
-            pygame.mixer.music.stop()
+    def fade_reverb(self, target: float, duration: float):
+        def _fade():
+            start = self.effects.reverb
+            steps = int(duration * 60)
+            for i in range(steps):
+                t = i / steps
+                self.effects.reverb = start + (target - start) * t
+                threading.Event().wait(duration / steps)
 
-    def move(self, pos: int) -> None:
-        """
-        move - Se déplacer temporellement dans le son actuellement diffusé
-        ---
-        params:
-            - pos: int = Position en seconde dans le son
-        """
+        threading.Thread(target=_fade, daemon=True).start()
 
-        self.logger.log(f"Moving music time to {pos}")
-        if self.state():
-            pygame.mixer.music.set_pos(pos)
+    def fade_lowpass(self, target: float, duration: float):
+        def _fade():
+            start = self.effects.lowpass
+            steps = int(duration * 60) # 60 étapes par secondes (Aucun rapport avec les FPS graphiques)
+            for i in range(steps):
+                t = i / steps
+                self.effects.lowpass = start + (target - start) * t
+                threading.Event().wait(duration / steps)
 
-    def update(self) -> None:
-        """
-        update - Fonction executée à chaque frames
-        """
-
-        if self.current_volume < self.requested_volume:
-            self.current_volume += 0.01
-            pygame.mixer.music.set_volume(self.current_volume)
-        elif self.current_volume > self.requested_volume:
-            self.current_volume -= 0.01
-            pygame.mixer.music.set_volume(self.current_volume)
-
-    @staticmethod
-    def state() -> bool:
-        """
-        state - Retourner le status actuel du son
-        """
-
-        return pygame.mixer.music.get_busy()
+        threading.Thread(target=_fade, daemon=True).start()

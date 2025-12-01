@@ -11,8 +11,11 @@ dependencies = [
     "munch>=4.0.0",
     "numpy>=2.3.3",
     "opencv-python>=4.11.0.86",
+    "pedalboard>=0.9.19",
     "pyaml>=25.7.0",
+    "pyaudio>=0.2.14",
     "pygame-ce>=2.5.5",
+    "sounddevice>=0.5.3",
 ]
 
 [tool.pytest.ini_options]

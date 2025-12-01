@@ -7,6 +7,7 @@ import pygame
 from core import context, error_handler, scene_manager, event_manager
 from systems import discord, logging
 from systems.config import config
+from systems.audio import AudioEngine
 
 
 class Game:
@@ -31,6 +32,7 @@ class Game:
 
         self.scene_manager = scene_manager.SceneManager()
         self.event_manager = event_manager.EventManager()
+        self.audio_engine = AudioEngine()
 
         self.discordrpc = discord.DiscordRPC()
 
@@ -87,6 +89,7 @@ class Game:
 
         self.logger.log("Initialising Pygame window")
         pygame.init()
+        self.audio_engine.start()
 
         self.window = pygame.display.set_mode(
             (self.config.graphics.window.width, self.config.graphics.window.height),
@@ -115,5 +118,6 @@ class Game:
             pygame.display.flip()
             self.clock.tick(self.config.graphics.fps)
 
+        self.audio_engine.stop()
         pygame.quit()
         return 0
