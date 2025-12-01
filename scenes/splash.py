@@ -20,30 +20,33 @@ class SplashScene(Scene):
         self.font = pygame.freetype.Font("assets/fonts/Monocraft.ttf", 36)
         self.text: str = "Made with love by Broke Team"
         self.text_color: list[int] = [255, 255, 255]
+        self.animation_state: bool = False
 
         self.song_played: bool = False
 
     def update(self) -> None:
-        if self.text_opacity < 255 and self._get_ticks() > 60:
+        if self.text_opacity < 255 and self.animation_state:
             self.text_opacity += (255 - self.text_opacity) * 0.1
             if not self.song_played:
                 self.text = "Made with love by Broke Team"
                 self.song_played = True
                 pygame.mixer.music.load("assets/sounds/sfx/splash.mp3")
                 pygame.mixer.music.play()
-        if self._get_ticks() > 120:
+        if self._get_ticks() == 60:
+            self.animation_state = True
+        elif self._get_ticks() == 120:
             self.text = "Powered by BrokeEngine"
-        if self._get_ticks() > 180:
+        elif self._get_ticks() == 180:
             self.text = "© • 2025-2026"
-        if self._get_ticks() == 230:
+        elif self._get_ticks() == 230:
             self.text_opacity = 0
+        elif self._get_ticks() == 270:
+            self.game.scene_manager.set_active_scene("menu")
         if self._get_ticks() > 230:
             self.fadeout += (255 - self.fadeout) * 0.03
             self.text_color = [255, 153, 191]
             indice = (self._get_ticks() - 230) // 4
             self.text = "Broke Out"[0 : int(indice)]
-        if self._get_ticks() > 270:
-            self.game.scene_manager.set_active_scene("menu")
 
     def draw(self) -> None:
         self.game.window.fill(self.color)
