@@ -70,6 +70,6 @@ engine:
   log_level: 4
 
 release:
-  version: "0.1.7b"
-  state: "STABLE"
+  version: "0.1.8-1"
+  state: "EDGE"
   compliant_name: "Winter Update"

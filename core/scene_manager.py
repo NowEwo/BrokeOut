@@ -92,6 +92,7 @@ class SceneManager(context.Context):
 
         self.logger.log(f"Changing active scene to '{scene_name}'")
 
+        self.game.audio_engine.stop_all()
         self.active.inactive()
         if hasattr(self.active, "__module__"):
             module_name = self.active.__module__

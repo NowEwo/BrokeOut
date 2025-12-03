@@ -9,7 +9,7 @@ from core.scene_manager import Scene
 from effects import screen_shake
 from objects.gui import mouse, button, hint
 from objects.menu import credits
-from systems import renderer, audio, logging
+from systems import renderer, logging
 
 
 class MenuScene(Scene):
@@ -29,6 +29,8 @@ class MenuScene(Scene):
 
         self.credits: bool = False
 
+        self.game.audio_engine.load_sound("menu_theme", "music/audio_menu.wav")
+
     def run(self) -> None:
         self.game.update_window_title("Main Menu")
 
@@ -37,9 +39,6 @@ class MenuScene(Scene):
         self.shaders = renderer.Renderer("crt")
 
         self.mouse = mouse.Mouse()
-
-        self.audio = audio.AudioEngine()
-        self.audio.play_file("assets/sounds/music/audio_menu.wav", True)
 
         self.shake.start(15, 5)
 
@@ -88,6 +87,8 @@ class MenuScene(Scene):
             "assets/images/store/gradient0.png"
         ).convert_alpha()
         self.gradient_rect: tuple = self.gradient.get_rect()
+
+        self.game.audio_engine.play_sound("menu_theme", True)
 
     def Quit(self) -> None:
         self.game.running = False
